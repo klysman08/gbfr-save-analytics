@@ -12,3 +12,6 @@ dist/
 .impeccable/questions/
 .impeccable/brief-body.md
 .impeccable/decision-payload.json
+
+# Original downloaded assets (not deployed)
+.assets-src/

@@ -8,9 +8,9 @@
 [Português](#português) · [English](#english)
 
 > [!WARNING]
-> **Aviso de responsabilidade.** Esta é uma ferramenta de **análise e correção de dados**. Qualquer alteração que você fizer nos seus arquivos de save é de **sua inteira responsabilidade**. Faça sempre um backup do save original antes de substituí-lo. O projeto é feito por fãs e **não tem afiliação com a Cygames** nem com os detentores de _Granblue Fantasy: Relink_. Nenhum asset do jogo é usado.
+> **Aviso de responsabilidade.** Esta é uma ferramenta de **análise e correção de dados**. Qualquer alteração que você fizer nos seus arquivos de save é de **sua inteira responsabilidade**. Faça sempre um backup do save original antes de substituí-lo. O projeto é feito por fãs e **não tem afiliação com a Cygames** nem com os detentores de _Granblue Fantasy: Relink_. O logotipo e as artes dos personagens vêm do site oficial do jogo e pertencem à Cygames; são usados apenas para ilustrar esta ferramenta de fãs.
 >
-> **Disclaimer.** This is a **data analytics and correction tool**. Any change you make to your save files is **entirely your own responsibility**. Always back up the original save before replacing it. This is a fan project, **not affiliated with Cygames** or the owners of _Granblue Fantasy: Relink_. No game assets are used.
+> **Disclaimer.** This is a **data analytics and correction tool**. Any change you make to your save files is **entirely your own responsibility**. Always back up the original save before replacing it. This is a fan project, **not affiliated with Cygames** or the owners of _Granblue Fantasy: Relink_. The logo and character artwork come from the game's official site and belong to Cygames; they are used only to illustrate this fan tool.
 
 ---
 
@@ -107,7 +107,7 @@ npm test         # parser, hash and analytics tests (synthetic save; no real dat
 npm run build    # type-check + production build to dist/
 ```
 
-Stack: Vite + TypeScript (no UI framework). Deployed to GitHub Pages by `.github/workflows/deploy.yml` on every push to `main`. Fonts (Shippori Mincho B1, Zen Kaku Gothic New) are self-hosted via Fontsource.
+Stack: Vite + TypeScript (no UI framework). Deployed to GitHub Pages by `.github/workflows/deploy.yml` on every push to `main`. The visual design follows the official Relink site (Zen Old Mincho, lavender paper, copper ornament dividers, portrait cards). Fonts (Zen Old Mincho, Zen Kaku Gothic New) are self-hosted via Fontsource; artwork lives in `public/art/`.
 
 > Never commit real save files. `.gitignore` excludes `*.dat` and `*.vdat`.
 
@@ -115,7 +115,7 @@ Stack: Vite + TypeScript (no UI framework). Deployed to GitHub Pages by `.github
 
 - Save format and hashing research: [Nenkai/GBFRDataTools](https://github.com/Nenkai/GBFRDataTools).
 - Name lists (fetched at runtime): [Nenkai/relink-modding](https://github.com/Nenkai/relink-modding).
-- _Granblue Fantasy: Relink_ is © Cygames, Inc. This project is unofficial and not endorsed by Cygames.
+- _Granblue Fantasy: Relink_, its logo and character artwork are © Cygames, Inc. (taken from the [official site](https://relink-ragnarok.granbluefantasy.com/)). This project is unofficial and not endorsed by Cygames; the artwork is not covered by this project's license.
 
 ## License
 

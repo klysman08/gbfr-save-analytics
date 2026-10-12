@@ -39,8 +39,8 @@ Analysis first, editing second. Every field carries its evidence level (confirme
 ## Brand Commitments
 
 - Must state clearly that this is an analytics and data-correction tool and that the user is entirely responsible for any change to their data (consent on first use, persistent notice, README disclaimer).
-- Not affiliated with Cygames; no official logos, character art, or game assets.
-- User-requested tone: cinematic, adventurous, evoking the game's sky-faring world (expressed through original visual design, not borrowed assets).
+- Not affiliated with Cygames; always credit Cygames for the logo and character artwork and keep the fan-project disclaimer visible.
+- Visual design follows the official Relink site (user decision, 2026-10-13): light lavender paper, Zen Old Mincho, copper ornament dividers, official portrait cards. Official artwork in public/art is user-provided from the official site.
 
 ## Evidence on Hand
 

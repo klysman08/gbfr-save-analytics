@@ -4,7 +4,8 @@ import { state } from './state';
 import { confMark, nameCell, numberCell, stringCell } from './cells';
 import { barList, columns, diverging } from './charts';
 import { dataTable } from './table';
-import { CATALOG, catalogOf } from '../core/catalog';
+import { CATALOG, catalogOf, type Confidence } from '../core/catalog';
+import { namePlate, portrait } from './art';
 import {
   EMPTY_HASH, formatValue, looksText, num, read, readAll, readString, rec, unitsOf, VALUE_TYPES,
   type SaveModel, type SectionName, type Unit,
@@ -25,7 +26,12 @@ function panel(title: string, opts: { note?: string; ink?: string; wide?: boolea
 }
 
 // ---------------------------------------------------------------- Dashboard
-export function dashboard(): HTMLElement {
+/** Centered section heading with the official site's ornament divider (lines + copper lozenge). */
+export function ornateTitle(text: string, tag: 'h1' | 'h2' = 'h2'): HTMLElement {
+  return h(tag, { class: 'ornate' }, h('span', {}, text), h('i', { class: 'ornament', 'aria-hidden': 'true' }));
+}
+
+export function dashboard(seal: Node): HTMLElement {
   const m = M();
   if (!m.isSlot || !rec(m, 1104)) return h('div', { class: 'view' }, panel(t('dashboard'), { note: t('configFile') }));
   const names = state.names;
@@ -35,50 +41,60 @@ export function dashboard(): HTMLElement {
   const delta = (a: number, b: number | undefined) =>
     b === undefined ? null : h('span', { class: `delta ${a - b > 0 ? 'up' : a - b < 0 ? 'down' : ''}` }, t('sinceCompare', { delta: fmtSigned(a - b), name: other!.name }));
 
-  const ledger = h('div', { class: 'ledger' },
-    h('div', { class: 'cell ink-chara' }, h('span', { class: 'lbl' }, confMark('likely', false), t('rupies')), numberCell(rec(m, 1104), 0, { label: t('rupies'), grouped: true }), delta(sum.rupies, prev?.rupies)),
-    h('div', { class: 'cell ink-chara' }, h('span', { class: 'lbl' }, confMark('likely', false), t('maxedChars')), h('strong', { class: 'fig' }, `${sum.maxed}`, h('small', {}, ` / ${sum.characters}`)), delta(sum.maxed, prev?.maxed)),
-    h('div', { class: 'cell ink-sigil' }, h('span', { class: 'lbl' }, confMark('confirmed', false), t('sigilCount')), h('strong', { class: 'fig' }, fmtInt(sum.sigils)), delta(sum.sigils, prev?.sigils)),
-    h('div', { class: 'cell ink-mat' }, h('span', { class: 'lbl' }, confMark('confirmed', false), t('materialKinds')), h('strong', { class: 'fig' }, fmtInt(sum.materials)), delta(sum.materials, prev?.materials)),
-    h('div', { class: 'cell ink-wep' }, h('span', { class: 'lbl' }, confMark('confirmed', false), t('weaponCount')), h('strong', { class: 'fig' }, fmtInt(sum.weapons)), delta(sum.weapons, prev?.weapons)),
-  );
-
   const ts = num(m, rec(m, 7201));
   const pty = party(m, names);
-  const player = h('dl', { class: 'facts' },
-    h('div', {}, h('dt', {}, confMark('confirmed', false), t('playerName')), h('dd', {}, stringCell(rec(m, 1101), { label: t('playerName') }))),
-    h('div', {}, h('dt', {}, confMark('possible', false), t('profileName')), h('dd', {}, stringCell(rec(m, 4413), { label: t('profileName') }))),
-    h('div', {}, h('dt', {}, confMark('likely', false), t('party')), h('dd', {}, pty.length ? pty.join(' · ') : t('none'))),
-    h('div', {}, h('dt', {}, confMark('likely', false), t('lastSaved')), h('dd', {}, ts ? fmtDate(ts) : t('none'))),
-  );
-
   const cs = recruited(characters(m, names));
   const ss = sigils(m, names);
   const mats = materials(m, names).filter(x => x.qty > 0);
   const ws = weapons(m, names);
 
+  const hero = h('section', { class: 'hero' },
+    h('div', { class: 'hero-art', 'aria-hidden': 'true' }),
+    h('div', { class: 'hero-copy' },
+      h('p', { class: 'hero-label' }, confMark('confirmed', false), t('playerName')),
+      h('div', { class: 'hero-name' }, stringCell(rec(m, 1101), { label: t('playerName') })),
+      h('dl', { class: 'hero-facts' },
+        h('div', {}, h('dt', {}, confMark('possible', false), t('profileName')), h('dd', {}, stringCell(rec(m, 4413), { label: t('profileName') }))),
+        h('div', {}, h('dt', {}, confMark('likely', false), t('party')), h('dd', {}, pty.length ? pty.join(' · ') : t('none'))),
+        h('div', {}, h('dt', {}, confMark('likely', false), t('lastSaved')), h('dd', {}, ts ? fmtDate(ts) : t('none'))))),
+    h('div', { class: 'hero-seal' }, seal));
+
+  const stat = (ink: string, conf: Confidence, label: string, value: Node, d: Node | null) =>
+    h('div', { class: `stat ink-${ink}` }, h('span', { class: 'lbl' }, confMark(conf, false), label), value, d);
+  const ledger = h('div', { class: 'ledger' },
+    stat('chara', 'likely', t('rupies'), numberCell(rec(m, 1104), 0, { label: t('rupies'), grouped: true }), delta(sum.rupies, prev?.rupies)),
+    stat('chara', 'likely', t('maxedChars'), h('strong', { class: 'fig' }, `${sum.maxed}`, h('small', {}, ` / ${sum.characters}`)), delta(sum.maxed, prev?.maxed)),
+    stat('sigil', 'confirmed', t('sigilCount'), h('strong', { class: 'fig' }, fmtInt(sum.sigils)), delta(sum.sigils, prev?.sigils)),
+    stat('mat', 'confirmed', t('materialKinds'), h('strong', { class: 'fig' }, fmtInt(sum.materials)), delta(sum.materials, prev?.materials)),
+    stat('wep', 'confirmed', t('weaponCount'), h('strong', { class: 'fig' }, fmtInt(sum.weapons)), delta(sum.weapons, prev?.weapons)),
+  );
+
   return h('div', { class: 'view dash' },
+    hero,
     ledger,
-    player,
-    h('div', { class: 'grid' },
-      panel(t('charProgress'), { note: t('charProgressNote'), ink: 'chara', wide: true }, characterTable(cs)),
-      panel(t('sigilLevels'), { ink: 'sigil' }, columns(levelHistogram(ss), 'sigil', [t('level'), t('count')])),
-      panel(t('topSigils'), { ink: 'sigil' }, barList(countBy(ss, x => x.name).slice(0, 10), 'sigil', { headers: [t('sigil'), t('count')] })),
-      panel(t('topMaterials'), { ink: 'mat' }, barList(mats.slice().sort((a, b) => b.qty - a.qty).slice(0, 10).map(x => ({ label: x.name, value: x.qty, sub: x.id })), 'mat', { headers: [t('material'), t('quantity')] })),
-      panel(t('weaponsByChar'), { ink: 'wep' }, barList(countBy(ws, w => w.owner || t('unknownChar')).slice(0, 12), 'wep', { headers: [t('owner'), t('count')] })),
-      evolutionPanel(),
-    ));
+    h('section', { class: 'band' },
+      ornateTitle(t('charProgress')),
+      h('p', { class: 'band-note' }, t('charProgressNote')),
+      characterGallery(cs)),
+    h('section', { class: 'band' },
+      ornateTitle(t('analysis')),
+      h('div', { class: 'grid' },
+        panel(t('sigilLevels'), { ink: 'sigil' }, columns(levelHistogram(ss), 'sigil', [t('level'), t('count')])),
+        panel(t('topSigils'), { ink: 'sigil' }, barList(countBy(ss, x => x.name).slice(0, 10), 'sigil', { headers: [t('sigil'), t('count')] })),
+        panel(t('topMaterials'), { ink: 'mat' }, barList(mats.slice().sort((a, b) => b.qty - a.qty).slice(0, 10).map(x => ({ label: x.name, value: x.qty, sub: x.id })), 'mat', { headers: [t('material'), t('quantity')] })),
+        panel(t('weaponsByChar'), { ink: 'wep' }, barList(countBy(ws, w => w.owner || t('noOwner')).slice(0, 12), 'wep', { headers: [t('owner'), t('count')] })),
+        evolutionPanel())));
 }
 
 function evolutionPanel(): HTMLElement {
   const m = M(), other = state.other;
-  if (!other || !other.isSlot) return panel(t('evolution'), { note: t('evolutionEmpty') });
+  if (!other || !other.isSlot) return panel(t('evolution'), { note: t('evolutionEmpty'), wide: true });
   const ev = evolution(other, m, state.names);
   return panel(t('evolution'), { wide: true },
     h('div', { class: 'sides' },
       h('span', { class: 'side a' }, t('sideA', { name: other.name })),
       h('span', { class: 'side b' }, t('sideB', { name: m.name }))),
-    h('dl', { class: 'facts tight' },
+    h('dl', { class: 'facts' },
       h('div', {}, h('dt', {}, t('rupiesDelta')), h('dd', { class: ev.rupies.diff < 0 ? 'neg' : 'pos' }, fmtSigned(ev.rupies.diff))),
       h('div', {}, h('dt', {}, t('sigilsGained')), h('dd', {}, fmtSigned(ev.sigilsGained))),
       h('div', {}, h('dt', {}, t('weaponsGained')), h('dd', {}, fmtSigned(ev.weaponsGained))),
@@ -94,33 +110,43 @@ function charName(c: Character): Node {
   return h('span', { class: 'named' }, h('span', {}, t('unknownChar'), ' ', confMark('possible', false)), h('span', { class: 'id' }, `#${c.hash.toString(16)}`));
 }
 
-/** Dense, sortable character table for the dashboard (read-only numbers). */
-function characterTable(cs: Character[]): HTMLElement {
-  const num = (label: string, key: (c: Character) => number) => ({ label, sort: key, numeric: true, cell: (c: Character) => fmtInt(key(c)) });
-  return dataTable<Character>([
-    { label: t('character'), sort: c => c.name || '~', cell: charName },
-    num(t('level'), c => c.level),
-    { label: t('progress'), sort: c => c.exp, cell: c => progressBar(c.exp / MAX_EXP, c.level >= MAX_LEVEL) },
-    num(t('exp'), c => c.exp),
-    num(t('hp'), c => c.hp),
-    num(t('atk'), c => c.atk),
-  ], cs, { caption: t('characters') });
+/** Portrait card in the official site's style: framed art, vertical name plate, level plate, EXP bar. */
+function characterCard(c: Character, i: number): HTMLElement {
+  const src = portrait(c.id);
+  const plate = namePlate(c.id);
+  const maxed = c.level >= MAX_LEVEL;
+  const name = c.name || t('unknownChar');
+  return h('figure', { class: `char-card${maxed ? ' max' : ''}${src ? '' : ' no-art'}`, style: { '--i': String(Math.min(i, 16)) } as unknown as Partial<CSSStyleDeclaration>, tabindex: '0', 'aria-label': `${name}, ${t('level')} ${c.level}, EXP ${fmtInt(c.exp)}` },
+    h('div', { class: 'char-art' },
+      src ? h('img', { src, alt: '', loading: 'lazy', decoding: 'async', width: 280, height: 536 }) : h('span', { class: 'char-unknown', 'aria-hidden': 'true' }, '?'),
+      plate ? h('img', { class: 'char-plate', src: plate, alt: '', loading: 'lazy', 'aria-hidden': 'true' }) : null,
+      h('span', { class: 'char-lv' }, maxed ? t('maxShort') : 'Lv', ' ', h('b', {}, c.level))),
+    h('figcaption', {},
+      h('span', { class: 'char-name' }, name),
+      progressBar(c.exp / MAX_EXP, maxed),
+      h('span', { class: 'char-exp' }, `EXP ${fmtInt(c.exp)}`)));
+}
+
+function characterGallery(cs: Character[]): HTMLElement {
+  return h('div', { class: 'gallery', role: 'list' }, cs.map((c, i) => { const card = characterCard(c, i); card.setAttribute('role', 'listitem'); return card; }));
 }
 
 export function charactersView(): HTMLElement {
   const m = M();
   const cs = recruited(characters(m, state.names));
   const r = (unit: number, id: number) => rec(m, id, unit);
-  return h('div', { class: 'view' }, panel(t('characters'), { note: t('charEditNote'), ink: 'chara', wide: true },
-    dataTable([
-      { label: t('character'), sort: c => c.name || '~', cell: charName },
-      { label: t('level'), sort: c => c.level, numeric: true, cell: c => numberCell(r(c.unit, 1308), 0, { width: '5em', label: `${c.name} ${t('level')}` }) },
-      { label: t('progress'), sort: c => c.exp, cell: c => progressBar(c.exp / MAX_EXP, c.level >= MAX_LEVEL) },
-      { label: t('exp'), sort: c => c.exp, numeric: true, cell: c => numberCell(r(c.unit, 1303), 0, { label: `${c.name} ${t('exp')}` }) },
-      { label: `${t('hp')}`, sort: c => c.hp, numeric: true, cell: c => numberCell(r(c.unit, 1309), 0, { width: '6em' }) },
-      { label: `${t('atk')}`, sort: c => c.atk, numeric: true, cell: c => numberCell(r(c.unit, 1310), 0, { width: '6em' }) },
-      { label: `${t('msp')}`, sort: c => c.msp, numeric: true, cell: c => numberCell(r(c.unit, 1321)) },
-    ], cs, { filter: c => `${c.name} ${c.id}`, caption: t('characters') })));
+  return h('div', { class: 'view' },
+    h('section', { class: 'band' }, ornateTitle(t('characters'), 'h1'), characterGallery(cs)),
+    panel(t('charEditTitle'), { note: t('charEditNote'), ink: 'chara', wide: true },
+      dataTable([
+        { label: t('character'), sort: c => c.name || '~', cell: charName },
+        { label: t('level'), sort: c => c.level, numeric: true, cell: c => numberCell(r(c.unit, 1308), 0, { width: '5em', label: `${c.name} ${t('level')}` }) },
+        { label: t('progress'), sort: c => c.exp, cell: c => progressBar(c.exp / MAX_EXP, c.level >= MAX_LEVEL) },
+        { label: t('exp'), sort: c => c.exp, numeric: true, cell: c => numberCell(r(c.unit, 1303), 0, { label: `${c.name} ${t('exp')}` }) },
+        { label: `${t('hp')}`, sort: c => c.hp, numeric: true, cell: c => numberCell(r(c.unit, 1309), 0, { width: '6em' }) },
+        { label: `${t('atk')}`, sort: c => c.atk, numeric: true, cell: c => numberCell(r(c.unit, 1310), 0, { width: '6em' }) },
+        { label: `${t('msp')}`, sort: c => c.msp, numeric: true, cell: c => numberCell(r(c.unit, 1321)) },
+      ], cs, { filter: c => `${c.name} ${c.id}`, caption: t('characters') })));
 }
 
 function progressBar(p: number, full: boolean): HTMLElement {
@@ -168,10 +194,10 @@ export function weaponsView(): HTMLElement {
   const ws = weapons(m, state.names);
   const hashName = (id: number, unit: number) => { const v = num(m, rec(m, id, unit)); return v && v !== EMPTY_HASH ? nameCell(v) : t('none'); };
   return h('div', { class: 'view' },
-    panel(t('weaponsByChar'), { ink: 'wep' }, barList(countBy(ws, w => w.owner || t('unknownChar')), 'wep', { headers: [t('owner'), t('count')] })),
+    panel(t('weaponsByChar'), { ink: 'wep' }, barList(countBy(ws, w => w.owner || t('noOwner')), 'wep', { headers: [t('owner'), t('count')] })),
     panel(t('weapons'), { ink: 'wep', wide: true }, dataTable([
       { label: t('weapon'), sort: w => w.name, cell: w => nameCell(w.hash, w.name) },
-      { label: t('owner'), sort: w => w.owner || '~', cell: w => w.owner || h('span', { class: 'muted' }, t('unknownChar')) },
+      { label: t('owner'), sort: w => w.owner || '~', cell: w => w.owner || h('span', { class: 'muted' }, t('noOwner')) },
       { label: t('exp'), sort: w => w.exp, numeric: true, cell: w => numberCell(rec(m, 2804, w.unit), 0, { label: `${w.name} ${t('exp')}` }) },
       { label: t('uncap'), sort: w => w.uncap, numeric: true, cell: w => numberCell(rec(m, 2805, w.unit), 0, { width: '4em' }) },
       { label: t('awakening'), sort: w => w.awakening, numeric: true, cell: w => numberCell(rec(m, 2806, w.unit), 0, { width: '4em' }) },

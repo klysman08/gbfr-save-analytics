@@ -27,7 +27,8 @@ export function characters(m: SaveModel, names: NameTable): Character[] {
       level, exp: r(1303), hp: r(1309), atk: r(1310), msp: r(1321),
     });
   }
-  return out.sort((a, b) => b.level - a.level || b.exp - a.exp || a.name.localeCompare(b.name));
+  // By level; at equal level, named characters before unknown hashes (guests/NPCs).
+  return out.sort((a, b) => b.level - a.level || Number(!a.id) - Number(!b.id) || b.exp - a.exp || a.name.localeCompare(b.name));
 }
 
 export const recruited = (cs: Character[]) => cs.filter(c => c.level > 1 || c.exp > 0);

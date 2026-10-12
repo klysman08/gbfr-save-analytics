@@ -1,8 +1,8 @@
 import { h, icon, downloadBlob, reducedMotion, storage } from './dom';
 import { fmtInt, getLang, setLang, t, type Lang } from '../i18n';
 import { state, notify, subscribe, type SealState } from './state';
-import { confMark } from './cells';
 import * as V from './views';
+import { art } from './art';
 import { parseSave, type SaveModel } from '../core/save';
 import { EditStore } from '../core/edits';
 import { checkHash, hex } from '../core/hash';
@@ -13,17 +13,17 @@ const REPO_URL = 'https://github.com/klysman08/gbfr-save-analytics';
 const CONSENT_KEY = 'gbfr-consent-v1';
 
 type Route = 'dashboard' | 'characters' | 'sigils' | 'materials' | 'weapons' | 'other' | 'explore' | 'ids' | 'compare' | 'changes';
-const ROUTES: { group: 'navAnalysis' | 'navData'; id: Route; icon: string; label: () => string }[] = [
-  { group: 'navAnalysis', id: 'dashboard', icon: 'dashboard', label: () => t('dashboard') },
-  { group: 'navAnalysis', id: 'characters', icon: 'characters', label: () => t('characters') },
-  { group: 'navAnalysis', id: 'sigils', icon: 'sigils', label: () => t('sigils') },
-  { group: 'navAnalysis', id: 'materials', icon: 'materials', label: () => t('materials') },
-  { group: 'navAnalysis', id: 'weapons', icon: 'weapons', label: () => t('weapons') },
-  { group: 'navAnalysis', id: 'other', icon: 'other', label: () => t('otherItems') },
-  { group: 'navData', id: 'explore', icon: 'explore', label: () => t('explore') },
-  { group: 'navData', id: 'ids', icon: 'ids', label: () => t('ids') },
-  { group: 'navData', id: 'compare', icon: 'compare', label: () => t('compare') },
-  { group: 'navData', id: 'changes', icon: 'changes', label: () => t('changes') },
+const ROUTES: { id: Route; label: () => string }[] = [
+  { id: 'dashboard', label: () => t('dashboard') },
+  { id: 'characters', label: () => t('characters') },
+  { id: 'sigils', label: () => t('sigils') },
+  { id: 'materials', label: () => t('materials') },
+  { id: 'weapons', label: () => t('weapons') },
+  { id: 'other', label: () => t('otherItems') },
+  { id: 'explore', label: () => t('explore') },
+  { id: 'ids', label: () => t('ids') },
+  { id: 'compare', label: () => t('compare') },
+  { id: 'changes', label: () => t('changes') },
 ];
 
 const currentRoute = (): Route => {
@@ -40,12 +40,10 @@ function computeCounts(m: SaveModel) {
     sigils: fmtInt(sigils(m, n).length),
     materials: fmtInt(materials(m, n).length),
     weapons: fmtInt(weapons(m, n).length),
-    explore: m.units.length >= 1000 ? `${Math.round(m.units.length / 1000)}k` : fmtInt(m.units.length),
-    ids: fmtInt(new Set(m.units.map(u => `${u.sec}:${u.id}`)).size),
   };
 }
 
-// ---------------------------------------------------------------- Seal (signature move)
+// ---------------------------------------------------------------- Integrity medallion
 function sealCopy(seal: SealState): { title: string; body: string } {
   switch (seal.kind) {
     case 'ok': return { title: t('sealOk'), body: t('sealOkBody', { index: seal.status.index }) };
@@ -56,51 +54,57 @@ function sealCopy(seal: SealState): { title: string; body: string } {
   }
 }
 
-function sealBlock(large: boolean): HTMLElement {
+function sealBlock(): HTMLElement {
   const seal = state.seal;
   const c = sealCopy(seal);
-  const index = 'status' in seal ? `#${seal.status.index}` : '';
-  return h('div', { class: `seal seal-${seal.kind}${large ? ' large' : ''}`, role: 'status', 'aria-live': 'polite' },
-    h('div', { class: 'stamp', 'aria-hidden': 'true' }, h('span', {}, 'XXH64'), h('b', {}, index || '—'), h('span', {}, t(`stamp_${seal.kind}` as never))),
+  const index = 'status' in seal ? `#${seal.status.index}` : '—';
+  return h('div', { class: `seal seal-${seal.kind}`, role: 'status', 'aria-live': 'polite' },
+    h('div', { class: 'medal', 'aria-hidden': 'true' },
+      h('span', { class: 'medal-ring' }),
+      h('span', { class: 'medal-core' }, icon(seal.kind === 'bad' ? 'alert' : 'check', 22), h('b', {}, index))),
     h('div', { class: 'seal-text' },
       h('strong', {}, c.title),
       h('p', {}, c.body),
-      'status' in seal ? h('code', {}, hex(seal.status.computed)) : null));
+      'status' in seal ? h('code', {}, 'XXH64 ', hex(seal.status.computed)) : null));
 }
 
-function stamp() {
+/** The medallion catches the light when the hash is verified or recalculated. */
+function shine() {
   if (reducedMotion()) return;
-  document.querySelectorAll<HTMLElement>('.seal .stamp').forEach(el => {
-    el.classList.remove('stamping');
+  document.querySelectorAll<HTMLElement>('.seal .medal').forEach(el => {
+    el.classList.remove('shine');
     void el.offsetWidth;
-    el.classList.add('stamping');
+    el.classList.add('shine');
   });
 }
 
 // ---------------------------------------------------------------- Shell
 export function mountShell(root: HTMLElement) {
-  const langSel = h('select', { class: 'lang', 'aria-label': t('language'), onchange: (e: Event) => { setLang((e.target as HTMLSelectElement).value as Lang); renderAll(); } },
-    h('option', { value: 'pt-BR', selected: getLang() === 'pt-BR' }, 'PT-BR'),
-    h('option', { value: 'en', selected: getLang() === 'en' }, 'EN'));
-
   const fileInput = h('input', { type: 'file', class: 'sr', accept: '.dat,.vdat', onchange: (e: Event) => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) openFile(f); (e.target as HTMLInputElement).value = ''; } });
   const compareInput = h('input', { type: 'file', class: 'sr', accept: '.dat', onchange: (e: Event) => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) openCompare(f); (e.target as HTMLInputElement).value = ''; } });
 
-  const header = h('header', { class: 'sky' });
-  const rail = h('nav', { class: 'rail', 'aria-label': 'Main' });
+  const header = h('header', { class: 'topbar' });
+  const nav = h('nav', { class: 'tabs', 'aria-label': 'Main' });
   const main = h('main', { id: 'main', tabindex: '-1' });
   const footer = h('footer', { class: 'foot' });
-  root.replaceChildren(h('a', { class: 'skip', href: '#main' }, 'Skip to content'), header, h('div', { class: 'body' }, rail, main), footer, fileInput, compareInput);
+  root.replaceChildren(
+    h('a', { class: 'skip', href: '#main' }, 'Skip to content'),
+    h('div', { class: 'backdrop', 'aria-hidden': 'true' }),
+    header, nav, main, footer, fileInput, compareInput);
 
   function renderHeader() {
     const m = state.model;
-    const busy = h('button', { type: 'button', class: 'btn seal-btn', disabled: !m, onclick: () => download(btnDl) }, icon('download'), h('span', {}, t('download')));
-    const btnDl = busy;
+    const btnDl = h('button', { type: 'button', class: 'btn primary', disabled: !m, onclick: () => download(btnDl) }, icon('download'), h('span', {}, t('download')));
+    const langSel = h('select', { class: 'lang', 'aria-label': t('language'), onchange: (e: Event) => { setLang((e.target as HTMLSelectElement).value as Lang); renderAll(); } },
+      h('option', { value: 'pt-BR', selected: getLang() === 'pt-BR' }, 'PT-BR'),
+      h('option', { value: 'en', selected: getLang() === 'en' }, 'EN'));
     header.replaceChildren(
-      h('div', { class: 'cartouche' }, h('b', {}, t('appName')), h('small', {}, t('tagline'))),
+      h('a', { class: 'brand', href: '#/dashboard', 'aria-label': t('appName') },
+        h('img', { class: 'brand-logo', src: art('logo.avif'), alt: 'Granblue Fantasy: Relink', width: 498, height: 140 }),
+        h('span', { class: 'brand-text' }, h('b', {}, 'Save Analytics'), h('small', {}, t('tagline')))),
       h('div', { class: 'status' },
         m ? h('span', { class: 'file' }, t('fileInfo', { name: m.name, size: (m.buf.length / 1048576).toFixed(1), units: fmtInt(m.units.length) })) : null,
-        m ? h('span', { class: `chip seal-chip seal-${state.seal.kind}` }, icon(state.seal.kind === 'bad' ? 'alert' : 'check', 14), sealCopy(state.seal).title) : null),
+        m ? h('span', { class: `chip seal-${state.seal.kind}` }, icon(state.seal.kind === 'bad' ? 'alert' : 'check', 14), sealCopy(state.seal).title) : null),
       h('div', { class: 'actions' },
         h('button', { type: 'button', class: 'btn ghost', 'aria-label': t('open'), title: t('open'), onclick: () => fileInput.click() }, icon('open'), h('span', {}, t('open'))),
         h('button', { type: 'button', class: 'btn ghost', 'aria-label': t('compareWith'), title: t('compareWith'), disabled: !m, onclick: () => compareInput.click() }, icon('compare'), h('span', {}, t('compareWith'))),
@@ -110,41 +114,29 @@ export function mountShell(root: HTMLElement) {
       m ? h('p', { class: 'dl-notice' }, t('downloadNotice')) : '');
   }
 
-  function renderRail() {
+  function renderNav() {
     const route = currentRoute();
     const m = state.model;
-    const items: HTMLElement[] = [];
-    let group = '';
-    for (const r of ROUTES) {
-      if (r.group !== group) { group = r.group; items.push(h('h6', {}, t(r.group))); }
+    nav.replaceChildren(h('div', { class: 'tabs-list' }, ROUTES.map(r => {
       const count = r.id === 'changes' ? (state.edits?.size ? fmtInt(state.edits.size) : '') : r.id === 'compare' ? (state.other ? 'A·B' : '') : counts[r.id] ?? '';
       const disabled = !m && r.id !== 'ids';
-      items.push(h('a', {
-        href: disabled ? undefined : `#/${r.id}`, class: `nav${r.id === route ? ' on' : ''}${disabled ? ' off' : ''}`,
+      return h('a', {
+        href: disabled ? undefined : `#/${r.id}`, class: `tab${r.id === route ? ' on' : ''}${disabled ? ' off' : ''}`,
         'aria-current': r.id === route ? 'page' : undefined, 'aria-disabled': disabled ? 'true' : undefined,
-      }, icon(r.icon), h('span', { class: 'label' }, r.label()), count ? h('span', { class: 'count' }, count) : null));
-    }
-    rail.replaceChildren(h('div', { class: 'rail-list' }, items, h('span', { class: 'rail-ink', 'aria-hidden': 'true' })));
-    placeInk();
-  }
-
-  function placeInk() {
-    const ink = rail.querySelector<HTMLElement>('.rail-ink');
-    const on = rail.querySelector<HTMLElement>('.nav.on');
-    if (!ink) return;
-    if (!on || !state.model) { ink.style.opacity = '0'; return; }
-    ink.style.opacity = '1';
-    ink.style.transform = `translateY(${on.offsetTop}px)`;
-    ink.style.height = `${on.offsetHeight}px`;
+      }, h('span', {}, r.label()), count ? h('sup', {}, count) : null);
+    })));
+    nav.querySelector('.tab.on')?.scrollIntoView({ block: 'nearest', inline: 'center' });
   }
 
   function renderFooter() {
     footer.replaceChildren(
+      h('i', { class: 'ornament', 'aria-hidden': 'true' }),
       h('p', { class: 'notice' }, t('footerNotice')),
       h('p', { class: 'credits' },
         h('a', { href: REPO_URL, target: '_blank', rel: 'noopener' }, icon('github', 14), ' ', t('source')),
         ' · ',
         h('a', { href: NAME_SOURCE_URL, target: '_blank', rel: 'noopener' }, t('namesCredit')),
+        ' · ', t('artCredit'),
         state.namesStatus === 'offline' ? h('span', { class: 'warn' }, ' · ', t('namesOffline')) : state.namesStatus === 'loading' ? h('span', {}, ' · ', t('namesLoading')) : null));
   }
 
@@ -163,9 +155,7 @@ export function mountShell(root: HTMLElement) {
       case 'ids': view = V.idsView(go); break;
       case 'compare': view = V.compareView(); break;
       case 'changes': view = V.changesView(); break;
-      default: view = h('div', { class: 'dash-wrap' }, V.dashboard(), h('aside', { class: 'dash-aside' }, sealBlock(true),
-        h('p', { class: 'notice-box' }, t('responsibilityBody')),
-        h('p', { class: 'legend' }, confMark('confirmed'), confMark('likely'), confMark('possible'))));
+      default: view = V.dashboard(sealBlock());
     }
     if (state.error) view.prepend(h('p', { class: 'error-box', role: 'alert' }, state.error));
     main.replaceChildren(view);
@@ -175,20 +165,27 @@ export function mountShell(root: HTMLElement) {
     const drop = h('label', { class: 'drop' },
       h('span', { class: 'drop-title' }, t('dropHere')),
       h('span', { class: 'drop-sub' }, t('orChoose')),
-      h('span', { class: 'btn seal-btn' }, icon('open'), t('open')));
+      h('span', { class: 'btn primary' }, icon('open'), t('open')));
     drop.addEventListener('click', e => { e.preventDefault(); fileInput.click(); });
     return h('div', { class: 'view welcome' },
-      h('h1', {}, t('welcomeTitle')),
-      h('p', { class: 'lead' }, t('welcomeBody')),
-      drop,
-      h('ol', { class: 'steps' }, h('li', {}, t('step1')), h('li', {}, t('step2')), h('li', {}, t('step3'))),
-      h('p', { class: 'note' }, t('whereIsSave')),
-      h('p', { class: 'notice-box' }, t('responsibilityBody')));
+      h('section', { class: 'welcome-hero' },
+        h('div', { class: 'welcome-sky', 'aria-hidden': 'true' }),
+        h('img', { class: 'welcome-duo', src: art('duo.avif'), alt: '', width: 1093, height: 1448 }),
+        h('div', { class: 'welcome-copy' },
+          h('img', { class: 'welcome-logo', src: art('logo.avif'), alt: 'Granblue Fantasy: Relink', width: 498, height: 140 }),
+          h('h1', {}, t('welcomeTitle')),
+          h('p', { class: 'lead' }, t('welcomeBody')),
+          drop)),
+      h('section', { class: 'band' },
+        V.ornateTitle(t('howItWorks')),
+        h('ol', { class: 'steps' }, h('li', {}, t('step1')), h('li', {}, t('step2')), h('li', {}, t('step3'))),
+        h('p', { class: 'note center' }, t('whereIsSave')),
+        h('p', { class: 'notice-box' }, t('responsibilityBody'))));
   }
 
   function renderAll() {
     document.title = state.model ? `${state.model.name} · ${t('appName')}` : t('appName');
-    renderHeader(); renderRail(); renderView(); renderFooter();
+    renderHeader(); renderNav(); renderView(); renderFooter();
     document.body.dataset.seal = state.model ? state.seal.kind : 'idle';
   }
 
@@ -202,14 +199,15 @@ export function mountShell(root: HTMLElement) {
     for (const p of [vt.ready, vt.finished, vt.updateCallbackDone]) p.catch(() => {});
   }
 
-  addEventListener('hashchange', () => transition(() => { renderRail(); renderView(); main.focus({ preventScroll: true }); scrollTo({ top: 0 }); }));
-  addEventListener('resize', placeInk);
+  addEventListener('hashchange', () => transition(() => { renderNav(); renderView(); main.focus({ preventScroll: true }); scrollTo({ top: 0 }); }));
 
   subscribe(reason => {
     if (reason === 'edits') {
       if (state.seal.kind === 'fixed' || state.seal.kind === 'ok') state.seal = { kind: 'pending' };
-      renderHeader(); renderRail();
+      renderHeader(); renderNav();
       if (currentRoute() === 'changes') renderView();
+      const seal = main.querySelector('.seal');
+      if (seal) seal.replaceWith(sealBlock());
       document.body.dataset.seal = state.seal.kind;
       return;
     }
@@ -229,14 +227,15 @@ export function mountShell(root: HTMLElement) {
     state.seal = { kind: 'pending' };
     computeCounts(m);
     if (currentRoute() === 'compare' && !state.other) go('dashboard');
-    printSky();
     notify('open');
-    // Hash check runs after first paint; the seal stamps when it lands.
+    document.body.classList.add('opening');
+    setTimeout(() => document.body.classList.remove('opening'), 1800);
+    // Hash check runs after first paint; the medallion shines when it lands.
     setTimeout(() => {
       const s = checkHash(m);
       state.seal = s ? { kind: s.ok ? 'ok' : 'bad', status: s } : { kind: 'none' };
       notify('seal');
-      stamp();
+      shine();
     }, 60);
   }
 
@@ -260,7 +259,7 @@ export function mountShell(root: HTMLElement) {
         downloadBlob(new Blob([m.buf as BlobPart], { type: 'application/octet-stream' }), m.name);
       } finally {
         notify('seal');
-        stamp();
+        shine();
       }
     }, 40);
   }
@@ -280,24 +279,15 @@ export function mountShell(root: HTMLElement) {
   consent();
 }
 
-/** The sky band is "printed" in layered ink pulls whenever a save opens (the focal moment). */
-function printSky() {
-  if (reducedMotion()) return;
-  const sky = document.querySelector<HTMLElement>('.sky');
-  if (!sky) return;
-  sky.classList.remove('printing');
-  void sky.offsetWidth;
-  sky.classList.add('printing');
-}
-
 function consent() {
   if (storage.get(CONSENT_KEY) === 'yes') return;
   const dlg = h('dialog', { class: 'consent', 'aria-labelledby': 'consent-title' },
-    h('div', { class: 'consent-band', 'aria-hidden': 'true' }),
-    h('h2', { id: 'consent-title' }, t('responsibilityTitle')),
+    h('img', { class: 'consent-logo', src: art('logo.avif'), alt: '', width: 498, height: 140 }),
+    V.ornateTitle(t('responsibilityTitle')),
     h('p', {}, t('responsibilityBody')),
     h('ul', {}, h('li', {}, t('responsibilityPoints1')), h('li', {}, t('responsibilityPoints2')), h('li', {}, t('responsibilityPoints3'))),
-    h('form', { method: 'dialog' }, h('button', { class: 'btn seal-btn', value: 'yes', autofocus: true }, icon('check'), t('responsibilityAccept'))));
+    h('form', { method: 'dialog' }, h('button', { class: 'btn primary', value: 'yes', autofocus: true }, icon('check'), t('responsibilityAccept'))));
+  dlg.querySelector('h2')!.id = 'consent-title';
   dlg.addEventListener('close', () => { if (dlg.returnValue === 'yes') storage.set(CONSENT_KEY, 'yes'); dlg.remove(); });
   dlg.addEventListener('cancel', e => e.preventDefault());
   document.body.append(dlg);
