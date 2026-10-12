@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--night:#0e1a33;--prussian:#1f3f73;--sky:#8fb6d6;--washi:#e9e2d0;--panel:#14223f;--line:#2a3d63;--seal:#d2452b;--gamboge:#e3a33b;--ink:#eef1f6;--muted:#9aa9c3;
+--chara:#e3a33b;--sigil:#8fb6d6;--mat:#7cc29a;--wep:#d97a5a}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--night);color:var(--ink);font:15px/1.45 "Zen Kaku Gothic New",sans-serif}
+.sky{height:118px;background:linear-gradient(180deg,#0a1530 0%,#1f3f73 45%,#5f8fbd 82%,#8fb6d6 100%);position:relative;display:flex;align-items:flex-end;padding:0 32px 18px;gap:24px}
+.sky:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:#0b1428}
+.cart{background:var(--washi);color:#14213d;padding:10px 18px 9px;border:2px solid #14213d;outline:1px solid var(--washi);outline-offset:3px}
+.cart b{font:800 26px/1 "Shippori Mincho B1",serif;letter-spacing:.02em}
+.cart small{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-top:4px;font-weight:700}
+.file{margin-left:auto;display:flex;gap:12px;align-items:center;font-size:13px;color:#dfe8f3}
+.btn{border:1.5px solid #dfe8f3;padding:8px 14px;color:#fff;font-weight:700;font-size:13px}
+.btn.p{background:var(--seal);border-color:var(--seal)}
+.wrap{display:grid;grid-template-columns:232px 1fr;height:782px}
+nav{border-right:1px solid var(--line);padding:22px 0}
+nav a{display:flex;justify-content:space-between;padding:10px 24px;color:var(--muted);text-decoration:none;font-weight:500}
+nav a span{font-variant-numeric:tabular-nums;font-size:12px;color:#6f80a0}
+nav a.on{color:var(--ink);background:linear-gradient(90deg,rgba(143,182,214,.16),transparent);box-shadow:inset 3px 0 0 var(--gamboge)}
+nav h6{font-size:10px;letter-spacing:.2em;color:#6f80a0;padding:18px 24px 6px;font-weight:700}
+main{padding:26px 32px;display:grid;grid-template-columns:1fr 330px;gap:24px;align-content:start}
+.k{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);grid-column:1/2}
+.k div{padding:16px 18px;border-right:1px solid var(--line)}.k div:last-child{border:0}
+.k label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.k strong{display:block;font:800 30px/1.1 "Shippori Mincho B1",serif;font-variant-numeric:tabular-nums;margin-top:6px}
+.k em{font-style:normal;font-size:12px;color:var(--mat)}
+.seal{grid-row:1/3;grid-column:2;border:1px solid var(--line);padding:20px;background:var(--panel);display:flex;flex-direction:column;gap:14px}
+.stamp{width:118px;height:118px;border:5px solid var(--seal);color:var(--seal);display:grid;place-items:center;text-align:center;transform:rotate(-4deg);font:800 15px/1.15 "Shippori Mincho B1",serif;letter-spacing:.06em;box-shadow:inset 0 0 0 3px var(--panel),inset 0 0 0 5px var(--seal)}
+.seal p{color:var(--muted);font-size:13px}
+.seal code{color:var(--ink);font-size:12px}
+.warn{border-left:3px solid var(--gamboge);padding:10px 12px;background:rgba(227,163,59,.08);font-size:12.5px;color:#e9dcc0}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;grid-column:1/2}
+caption{text-align:left;font:800 18px "Shippori Mincho B1",serif;padding-bottom:10px;border-bottom:2px solid var(--chara)}
+th{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid #1c2c4d}
+td.n{text-align:right}
+.bar{height:6px;background:#1c2c4d;width:160px}.bar i{display:block;height:6px;background:var(--chara)}
+.c{display:inline-block;width:10px;height:10px;border:1.5px solid var(--sky);margin-right:6px;vertical-align:-1px}
+.c.f{background:var(--sky)}.c.h{background:linear-gradient(90deg,var(--sky) 50%,transparent 50%)}
+</style></head><body>
+<header class="sky">
+  <div class="cart"><b>GBFR Save Analytics</b><small>análise e correção de dados</small></div>
+  <div class="file">SaveData1.dat · 22,0 MB · 212.322 unidades <span class="btn">Comparar com…</span><span class="btn p">Baixar save corrigido</span></div>
+</header>
+<div class="wrap">
+<nav>
+  <h6>ANÁLISE</h6>
+  <a class="on" href="#">Painel <span>—</span></a>
+  <a href="#">Personagens <span>29</span></a>
+  <a href="#">Sigilos <span>551</span></a>
+  <a href="#">Materiais <span>448</span></a>
+  <a href="#">Armas <span>78</span></a>
+  <h6>DADOS</h6>
+  <a href="#">Explorar tudo <span>212k</span></a>
+  <a href="#">Tabela de IDs <span>630</span></a>
+  <a href="#">Comparar <span>A·B</span></a>
+  <a href="#">Alterações <span>0</span></a>
+</nav>
+<main>
+  <section class="k">
+    <div><label>Rupies</label><strong>2.464.174</strong><em>−320.000 desde o backup</em></div>
+    <div><label>Personagens Lv 100</label><strong>13 / 29</strong><em>+0</em></div>
+    <div><label>Sigilos</label><strong>551</strong><em>+4 novos</em></div>
+    <div><label>Materiais</label><strong>448</strong><em>11 mudaram</em></div>
+  </section>
+  <aside class="seal">
+    <div class="stamp">HASH<br>VERIFICADO<br>#1</div>
+    <p>Integridade XXHash64 confere com o arquivo. <code>36dab22fc7d56e6c</code></p>
+    <div class="warn">Ferramenta de análise e correção. Você é inteiramente responsável por qualquer alteração nos seus dados. Faça backup antes de substituir o save.</div>
+    <p><span class="c f"></span>confirmado <span class="c h"></span>provável <span class="c"></span>possível</p>
+  </aside>
+  <table>
+    <caption>Personagens</caption>
+    <tr><th>Personagem</th><th>Nível</th><th>Progresso</th><th class="n">EXP</th><th class="n">HP</th><th class="n">ATK</th></tr>
+    <tr><td>Djeeta</td><td>100</td><td><div class="bar"><i style="width:100%"></i></div></td><td class="n">8.400.000</td><td class="n">3.430</td><td class="n">677</td></tr>
+    <tr><td>Katalina</td><td>100</td><td><div class="bar"><i style="width:100%"></i></div></td><td class="n">8.400.000</td><td class="n">3.499</td><td class="n">656</td></tr>
+    <tr><td>Charlotta</td><td>100</td><td><div class="bar"><i style="width:100%"></i></div></td><td class="n">8.400.000</td><td class="n">3.399</td><td class="n">665</td></tr>
+    <tr><td>Ghandagoza</td><td>90</td><td><div class="bar"><i style="width:50%"></i></div></td><td class="n">4.206.660</td><td class="n">3.209</td><td class="n">581</td></tr>
+    <tr><td>Rosetta</td><td>62</td><td><div class="bar"><i style="width:9%"></i></div></td><td class="n">790.391</td><td class="n">1.835</td><td class="n">231</td></tr>
+    <tr><td>Rackam</td><td>62</td><td><div class="bar"><i style="width:9%"></i></div></td><td class="n">796.665</td><td class="n">2.022</td><td class="n">224</td></tr>
+  </table>
+</main>
+</div>
+</body></html>

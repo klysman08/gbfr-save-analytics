@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.log
+# Never commit real save files
+*.dat
+*.vdat
+*.bak-*
+# impeccable local review artifacts
+.impeccable/review/
+.impeccable/live/
+.impeccable/config.local.json
+.impeccable/questions/
+.impeccable/brief-body.md
+.impeccable/decision-payload.json

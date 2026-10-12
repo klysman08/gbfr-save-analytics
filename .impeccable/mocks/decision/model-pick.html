@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Karla:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--void:#0b1024;--plate:#121a3a;--line:#26315e;--gilt:#c9a45c;--vellum:#e8e1cf;--star:#7fa7c9;--muted:#8d94b8}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;color:var(--vellum);font:15px/1.45 Karla,sans-serif;
+background:var(--void) repeating-linear-gradient(0deg,transparent 0 59px,rgba(201,164,92,.07) 59px 60px),repeating-linear-gradient(90deg,transparent 0 59px,rgba(201,164,92,.07) 59px 60px)}
+header{display:flex;align-items:center;gap:20px;padding:22px 36px;border-bottom:1px solid var(--gilt)}
+h1{font:700 22px Cinzel,serif;letter-spacing:.14em;color:var(--gilt)}
+header span{color:var(--muted);font-size:13px}
+.act{margin-left:auto;display:flex;gap:10px}
+.b{border:1px solid var(--gilt);color:var(--gilt);padding:8px 14px;font-size:13px}
+.b.p{background:var(--gilt);color:var(--void)}
+.tabs{display:flex;gap:28px;padding:0 36px;border-bottom:1px solid var(--line)}
+.tabs a{padding:14px 0;color:var(--muted);font-size:14px;text-decoration:none}
+.tabs a.on{color:var(--vellum);box-shadow:inset 0 -2px 0 var(--gilt)}
+main{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;padding:28px 36px}
+.sky{border:1px solid var(--line);background:rgba(18,26,58,.8);height:640px;position:relative}
+.sky h2,.p h2{font:500 15px Cinzel,serif;letter-spacing:.12em;color:var(--gilt);padding:16px 18px;border-bottom:1px solid var(--line)}
+svg{position:absolute;inset:56px 0 0 0}
+.p{border:1px solid var(--line);background:rgba(18,26,58,.8);margin-bottom:22px}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr)}
+.kpi div{padding:16px 18px;border-right:1px solid var(--line)}
+.kpi label{font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.kpi b{display:block;font:700 26px Cinzel,serif;color:var(--vellum);font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+td,th{padding:9px 18px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:11px;letter-spacing:.14em;color:var(--muted)}
+.w{font-size:12.5px;color:#d8c9a2;padding:12px 18px;border-top:1px solid var(--gilt)}
+</style></head><body>
+<header><h1>GBFR SAVE ANALYTICS</h1><span>SaveData1.dat · hash ✓ #1</span><div class="act"><span class="b">Comparar</span><span class="b p">Baixar save corrigido</span></div></header>
+<nav class="tabs"><a class="on">Painel</a><a>Personagens</a><a>Sigilos</a><a>Materiais</a><a>Armas</a><a>Explorar</a><a>IDs</a><a>Alterações</a></nav>
+<main>
+<section class="sky"><h2>CONSTELAÇÃO DO GRUPO</h2>
+<svg width="100%" height="560" viewBox="0 0 640 560">
+<g stroke="#c9a45c" stroke-width="1" fill="none" opacity=".8"><path d="M90 120 L220 90 L330 170 L460 130 L560 220"/><path d="M220 90 L250 260 L380 330 L330 170"/><path d="M250 260 L150 380 L260 470 L380 330 L520 410"/></g>
+<g fill="#e8e1cf"><circle cx="90" cy="120" r="6"/><circle cx="220" cy="90" r="7"/><circle cx="330" cy="170" r="7"/><circle cx="460" cy="130" r="5"/><circle cx="560" cy="220" r="4"/><circle cx="250" cy="260" r="6"/><circle cx="380" cy="330" r="7"/><circle cx="150" cy="380" r="3"/><circle cx="260" cy="470" r="3"/><circle cx="520" cy="410" r="4"/></g>
+<g fill="#8d94b8" font-size="12" font-family="Karla"><text x="100" y="112">Djeeta 100</text><text x="230" y="82">Katalina 100</text><text x="340" y="165">Io 100</text><text x="470" y="124">Narmaya 100</text><text x="390" y="325">Charlotta 100</text><text x="160" y="375">Rosetta 62</text><text x="530" y="405">Fediel 100</text></g>
+</svg></section>
+<section>
+<div class="p kpi"><div><label>Rupies</label><b>2.464.174</b></div><div><label>Sigilos</label><b>551</b></div><div><label>Lv 100</label><b>13/29</b></div></div>
+<div class="p"><h2>SIGILOS MAIS COMUNS</h2><table><tr><th>SIGILO</th><th>QTD</th><th>NÍVEL MÉD.</th></tr>
+<tr><td>Critical Hit Rate V</td><td>38</td><td>11,4</td></tr><tr><td>Enmity V</td><td>21</td><td>11,0</td></tr><tr><td>Attack Power V</td><td>19</td><td>12,2</td></tr><tr><td>Improved Dodge</td><td>12</td><td>11,0</td></tr></table>
+<p class="w">Ferramenta de análise e correção de dados. Você é inteiramente responsável por qualquer alteração.</p></div>
+</section></main></body></html>
