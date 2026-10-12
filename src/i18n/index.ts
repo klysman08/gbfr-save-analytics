@@ -6,23 +6,25 @@ export type Dict = typeof ptBR;
 type Key = keyof Dict;
 
 const DICTS: Record<Lang, Dict> = { 'pt-BR': ptBR, en };
-const STORE_KEY = 'gbfr-lang';
+// v2: earlier builds saved the browser language automatically; only an explicit choice is stored now.
+const STORE_KEY = 'gbfr-lang-v2';
 
 function initial(): Lang {
   try {
     const saved = localStorage.getItem(STORE_KEY);
     if (saved === 'pt-BR' || saved === 'en') return saved;
   } catch { /* storage unavailable */ }
-  return navigator.language?.toLowerCase().startsWith('pt') ? 'pt-BR' : 'en';
+  return 'en';
 }
 
 let lang: Lang = initial();
 
 export const getLang = () => lang;
 
-export function setLang(l: Lang) {
+/** Applies a language; persist=true only for the user's explicit choice in the selector. */
+export function setLang(l: Lang, persist = true) {
   lang = l;
-  try { localStorage.setItem(STORE_KEY, l); } catch { /* storage unavailable */ }
+  if (persist) try { localStorage.setItem(STORE_KEY, l); } catch { /* storage unavailable */ }
   document.documentElement.lang = l;
 }
 

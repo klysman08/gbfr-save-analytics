@@ -10,7 +10,7 @@ import { loadNames } from './core/names';
 import { state, notify } from './ui/state';
 import { mountShell } from './ui/shell';
 
-setLang(getLang());
+setLang(getLang(), false);
 mountShell(document.getElementById('app')!);
 
 loadNames().then(({ status, table }) => {
