@@ -4,6 +4,8 @@
 
 🔗 **https://klysman08.github.io/gbfr-save-analytics/**
 
+![Dashboard with the integrity seal, KPIs and the protagonist card over the official key art](docs/screenshots/dashboard.webp)
+
 > [!WARNING]
 > **Disclaimer.** This is a **data analytics and correction tool**. Any change you make to your save files is **entirely your own responsibility**. Always back up the original save before replacing it. This is a fan project, **not affiliated with Cygames** or the owners of _Granblue Fantasy: Relink_. The logo and character artwork come from the game's official site and belong to Cygames; they are used only to illustrate this fan tool.
 
@@ -20,6 +22,17 @@
 - **Data correction.** Edit values with type and range validation. Every change is listed and can be undone until you download.
 - **ID table.** Each field shows what is known about it and how confident that is (confirmed, likely, possible or unknown). You can add your own notes, then export or import them.
 - **Interface in English and Brazilian Portuguese.** English is the default; switch with the language selector.
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Welcome screen with the drop zone](docs/screenshots/welcome.webp) | ![Character gallery with official portraits, level plates and EXP bars](docs/screenshots/characters.webp) |
+| **Welcome** — drop your save; it never leaves the browser. | **Characters** — official portraits with level, MAX plate and EXP progress. |
+| ![Charts of sigils by level, most numerous sigils, materials and weapons](docs/screenshots/analysis.webp) | ![Evolution between two saves: Rupies, sigils and materials gained or spent](docs/screenshots/compare.webp) |
+| **Save analysis** — sigils, materials and weapons at a glance. | **Compare** — what changed between a backup and your current save. |
+| ![ID table with descriptions, confidence levels and personal notes](docs/screenshots/ids.webp) | <img src="docs/screenshots/mobile.webp" alt="Mobile layout of the dashboard" width="260"> |
+| **ID table** — what each field means and how sure we are. | **Mobile** — the whole app works on a phone. |
 
 ## How to use
 
