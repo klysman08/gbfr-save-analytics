@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { en } from '../src/i18n/en';
 import { ptBR } from '../src/i18n/pt-BR';
 import { ja } from '../src/i18n/ja';
-import { getLang, setLang, t, fmtInt, fmtPct, fmtSigned } from '../src/i18n';
+import { getLang, setLang, getLangUrl, t, fmtInt, fmtPct, fmtSigned } from '../src/i18n';
 import { CATALOG } from '../src/core/catalog';
 
 describe('i18n', () => {
@@ -54,5 +54,11 @@ describe('i18n', () => {
       expect(typeof entry.ja).toBe('string');
       expect(entry.ja.trim().length).toBeGreaterThan(0);
     }
+  });
+
+  it('generates correct language urls for SEO and navigation', () => {
+    expect(getLangUrl('en')).toContain('/');
+    expect(getLangUrl('pt-BR')).toContain('/pt/');
+    expect(getLangUrl('ja')).toContain('/ja/');
   });
 });

@@ -1,5 +1,5 @@
 import { h, icon, downloadBlob, reducedMotion, storage } from './dom';
-import { fmtInt, getLang, setLang, t, type Lang } from '../i18n';
+import { fmtInt, getLang, getLangUrl, setLang, t, type Lang } from '../i18n';
 import { state, notify, subscribe, type SealState } from './state';
 import * as V from './views';
 import { art } from './art';
@@ -98,7 +98,23 @@ export function mountShell(root: HTMLElement) {
   function renderHeader() {
     const m = state.model;
     const btnDl = h('button', { type: 'button', class: 'btn primary', 'data-sfx': 'download', disabled: !m, onclick: () => download(btnDl) }, icon('download'), h('span', {}, t('download')));
-    const langSel = h('select', { class: 'lang', 'aria-label': t('language'), onchange: (e: Event) => { setLang((e.target as HTMLSelectElement).value as Lang); renderAll(); } },
+    const langSel = h('select', {
+      class: 'lang',
+      'aria-label': t('language'),
+      onchange: (e: Event) => {
+        const nextLang = (e.target as HTMLSelectElement).value as Lang;
+        if (nextLang === getLang()) return;
+        setLang(nextLang);
+        if (!state.model) {
+          location.href = getLangUrl(nextLang);
+          return;
+        }
+        try {
+          history.pushState(null, '', getLangUrl(nextLang));
+        } catch { /* ignore */ }
+        renderAll();
+      },
+    },
       h('option', { value: 'pt-BR', selected: getLang() === 'pt-BR' }, 'PT-BR'),
       h('option', { value: 'en', selected: getLang() === 'en' }, 'EN'),
       h('option', { value: 'ja', selected: getLang() === 'ja' }, 'JA'));

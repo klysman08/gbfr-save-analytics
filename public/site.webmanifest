@@ -1,0 +1,22 @@
+{
+  "name": "GBFR Save Analytics",
+  "short_name": "GBFR Analytics",
+  "description": "Analytics and data-correction tool for Granblue Fantasy: Relink save files.",
+  "start_url": "/gbfr-save-analytics/",
+  "scope": "/gbfr-save-analytics/",
+  "display": "standalone",
+  "background_color": "#f7f6fb",
+  "theme_color": "#f7f6fb",
+  "icons": [
+    {
+      "src": "/gbfr-save-analytics/relink-icon.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/gbfr-save-analytics/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

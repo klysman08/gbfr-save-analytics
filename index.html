@@ -5,12 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
     <meta name="theme-color" content="#f7f6fb" />
-    <meta name="description" content="Analytics and data-correction tool for Granblue Fantasy: Relink save files. Runs 100% in your browser; the save never leaves your machine." />
+
+    <!-- Primary SEO Meta Tags -->
+    <title>GBFR Save Analytics — Granblue Fantasy: Relink Save Editor &amp; Analyzer</title>
+    <meta name="title" content="GBFR Save Analytics — Granblue Fantasy: Relink Save Editor &amp; Analyzer" />
+    <meta name="description" content="Free, browser-based analytics and data-correction tool for Granblue Fantasy: Relink (PC). Recalculate XXHash64 checksums, view characters, sigils, materials, and compare saves safely." />
+    <meta name="keywords" content="Granblue Fantasy Relink save editor, GBFR SaveData1.dat fix checksum, Relink save analyzer, sigils materials calculator, Steam PC, XXHash64" />
+    <meta name="author" content="klysman08" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+
+    <!-- Canonical and Multilingual Alternates -->
+    <link rel="canonical" href="https://klysman08.github.io/gbfr-save-analytics/" />
+    <link rel="alternate" hreflang="x-default" href="https://klysman08.github.io/gbfr-save-analytics/" />
+    <link rel="alternate" hreflang="en" href="https://klysman08.github.io/gbfr-save-analytics/" />
+    <link rel="alternate" hreflang="pt-BR" href="https://klysman08.github.io/gbfr-save-analytics/pt/" />
+    <link rel="alternate" hreflang="ja" href="https://klysman08.github.io/gbfr-save-analytics/ja/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GBFR Save Analytics" />
+    <meta property="og:url" content="https://klysman08.github.io/gbfr-save-analytics/" />
+    <meta property="og:title" content="GBFR Save Analytics — Granblue Fantasy: Relink Save Editor &amp; Analyzer" />
+    <meta property="og:description" content="Free, browser-based analytics and data-correction tool for Granblue Fantasy: Relink (PC). Recalculate XXHash64 checksums, view characters, sigils, materials, and compare saves safely." />
+    <meta property="og:image" content="https://klysman08.github.io/gbfr-save-analytics/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="GBFR Save Analytics dashboard preview showing character progress, seal integrity and statistics" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="pt_BR" />
+    <meta property="og:locale:alternate" content="ja_JP" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://klysman08.github.io/gbfr-save-analytics/" />
+    <meta name="twitter:title" content="GBFR Save Analytics — Granblue Fantasy: Relink Save Editor &amp; Analyzer" />
+    <meta name="twitter:description" content="Free, browser-based analytics and data-correction tool for Granblue Fantasy: Relink (PC). Recalculate XXHash64 checksums, view characters, sigils, materials, and compare saves safely." />
+    <meta name="twitter:image" content="https://klysman08.github.io/gbfr-save-analytics/og-image.png" />
+
+    <!-- App Icons & Manifest -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/relink-icon.png" type="image/png" sizes="32x32" />
-    <title>GBFR Save Analytics</title>
+    <link rel="apple-touch-icon" href="/relink-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://klysman08.github.io/gbfr-save-analytics/#webapp",
+          "name": "GBFR Save Analytics",
+          "alternateName": ["Granblue Fantasy Relink Save Editor", "GBFR SaveData1.dat Analyzer"],
+          "url": "https://klysman08.github.io/gbfr-save-analytics/",
+          "description": "Analytics and data-correction tool for Granblue Fantasy: Relink save files. Runs 100% locally in your browser with XXHash64 checksum recalculation.",
+          "applicationCategory": "UtilitiesApplication",
+          "operatingSystem": "Any (Web Browser)",
+          "browserRequirements": "Requires modern web browser with JavaScript enabled (Chrome, Firefox, Edge, Safari)",
+          "inLanguage": ["en", "pt-BR", "ja"],
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "author": {
+            "@type": "Person",
+            "name": "klysman08",
+            "url": "https://github.com/klysman08"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://klysman08.github.io/gbfr-save-analytics/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is my Granblue Fantasy: Relink save file uploaded to an external server?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. GBFR Save Analytics runs 100% locally in your browser. Your SaveData1.dat is parsed and edited entirely on your device with no trackers or analytics."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does the tool fix corrupted save hashes in Granblue Fantasy: Relink?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The game validates save integrity using 10 XXHash64 hashes (seed 0x2F1A43EBCD) stored in the save container. When you download a corrected save, the app recomputes the hash on slot index uint 1003 % 10 so the game accepts it cleanly."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Where is the SaveData1.dat location on PC (Steam)?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "On Steam PC, save files live in %LOCALAPPDATA%\\GBFR\\Saved\\SaveGames along with SaveData1_BackUp.dat and SaveData1_BackUp2.dat."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div class="seo-fallback" style="padding: 2rem 1.5rem; max-width: 960px; margin: 0 auto; font-family: system-ui, -apple-system, sans-serif; color: #1b1a24; line-height: 1.6;">
+        <header style="margin-bottom: 2rem;">
+          <h1 style="font-size: 2rem; margin-bottom: 0.5rem; color: #1b1a24;">GBFR Save Analytics — Granblue Fantasy: Relink Save Editor &amp; Analyzer</h1>
+          <p style="font-size: 1.15rem; color: #45424f;">Free browser-based analytics and data-correction tool for <em>Granblue Fantasy: Relink</em> (PC). Inspect party progression, calculate XXHash64 checksums, manage sigils &amp; materials, and compare saves — 100% locally in your browser.</p>
+        </header>
+
+        <section style="margin-bottom: 2rem;">
+          <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem;">Key Features</h2>
+          <ul style="padding-left: 1.25rem;">
+            <li><strong>XXHash64 Integrity Verification &amp; Fix:</strong> Automatically checks and recalculates save checksums on download so the game recognizes modified files.</li>
+            <li><strong>Character Roster &amp; Progression:</strong> Inspect level, MSP, EXP, equipped weapons, and party configuration.</li>
+            <li><strong>Sigils &amp; Inventory Analytics:</strong> Breakdown of sigils by level, abundant/depleted materials, and items.</li>
+            <li><strong>Save Comparison &amp; Evolution:</strong> Compare differences between backups (e.g. SaveData1_BackUp.dat) and current saves.</li>
+            <li><strong>100% Private &amp; Offline-Ready:</strong> Zero server uploads or trackers. Your save data never leaves your machine.</li>
+          </ul>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+          <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem;">Frequently Asked Questions</h2>
+          <details style="margin-bottom: 0.75rem;">
+            <summary style="font-weight: 600; cursor: pointer;">Is my save file uploaded to any external server?</summary>
+            <p style="margin-top: 0.25rem; color: #45424f;">No. The entire parsing, editing, and checksum calculation runs directly in your browser. No files or analytics are sent anywhere.</p>
+          </details>
+          <details style="margin-bottom: 0.75rem;">
+            <summary style="font-weight: 600; cursor: pointer;">Where do I find my SaveData1.dat file?</summary>
+            <p style="margin-top: 0.25rem; color: #45424f;">On Windows PC (Steam), saves are stored in <code>%LOCALAPPDATA%\GBFR\Saved\SaveGames</code>.</p>
+          </details>
+          <details style="margin-bottom: 0.75rem;">
+            <summary style="font-weight: 600; cursor: pointer;">How do I fix a corrupted save checksum in Granblue Fantasy: Relink?</summary>
+            <p style="margin-top: 0.25rem; color: #45424f;">Drop your SaveData1.dat file into this tool, verify the integrity seal, and click "Download corrected save" to generate a valid XXHash64 checksum.</p>
+          </details>
+        </section>
+      </div>
+    </div>
     <noscript>GBFR Save Analytics needs JavaScript: the save file is read locally in your browser.</noscript>
     <script type="module" src="/src/main.ts"></script>
   </body>

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#f7f6fb" />
+
+    <!-- Primary SEO Meta Tags -->
+    <title>GBFR Save Analytics — 『グランブルーファンタジー リリンク』セーブデータ解析・編集ツール</title>
+    <meta name="title" content="GBFR Save Analytics — 『グランブルーファンタジー リリンク』セーブデータ解析・編集ツール" />
+    <meta name="description" content="ブラウザ完結で安全な『グランブルーファンタジー リリンク』(PC版) セーブデータ解析・修正ツール。XXHash64チェックサム再計算、キャラクター進行度、ジーン、素材の分析と比較に対応。" />
+    <meta name="keywords" content="グランブルーファンタジー リリンク, GBFR, セーブデータ編集, SaveData1.dat, ハッシュ計算, チェックサム, ジーン, キャラクター, Steam PC, XXHash64" />
+    <meta name="author" content="klysman08" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+
+    <!-- Canonical and Multilingual Alternates -->
+    <link rel="canonical" href="https://klysman08.github.io/gbfr-save-analytics/ja/" />
+    <link rel="alternate" hreflang="x-default" href="https://klysman08.github.io/gbfr-save-analytics/" />
+    <link rel="alternate" hreflang="en" href="https://klysman08.github.io/gbfr-save-analytics/" />
+    <link rel="alternate" hreflang="pt-BR" href="https://klysman08.github.io/gbfr-save-analytics/pt/" />
+    <link rel="alternate" hreflang="ja" href="https://klysman08.github.io/gbfr-save-analytics/ja/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GBFR Save Analytics" />
+    <meta property="og:url" content="https://klysman08.github.io/gbfr-save-analytics/ja/" />
+    <meta property="og:title" content="GBFR Save Analytics — 『グランブルーファンタジー リリンク』セーブデータ解析・編集ツール" />
+    <meta property="og:description" content="ブラウザ完結で安全な『グランブルーファンタジー リリンク』(PC版) セーブデータ解析・修正ツール。XXHash64チェックサム再計算、キャラクター進行度、ジーン、素材の分析と比較に対応。" />
+    <meta property="og:image" content="https://klysman08.github.io/gbfr-save-analytics/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="GBFR Save Analytics のダッシュボードプレビュー（キャラクター進行度、整合性シール、ステータス表示）" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="pt_BR" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://klysman08.github.io/gbfr-save-analytics/ja/" />
+    <meta name="twitter:title" content="GBFR Save Analytics — 『グランブルーファンタジー リリンク』セーブデータ解析・編集ツール" />
+    <meta name="twitter:description" content="ブラウザ完結で安全な『グランブルーファンタジー リリンク』(PC版) セーブデータ解析・修正ツール。XXHash64チェックサム再計算、キャラクター進行度、ジーン、素材の分析と比較に対応。" />
+    <meta name="twitter:image" content="https://klysman08.github.io/gbfr-save-analytics/og-image.png" />
+
+    <!-- App Icons & Manifest -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/relink-icon.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/relink-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://klysman08.github.io/gbfr-save-analytics/ja/#webapp",
+          "name": "GBFR Save Analytics",
+          "alternateName": ["リリンク セーブデータ解析", "GBFR SaveData1.dat ツール"],
+          "url": "https://klysman08.github.io/gbfr-save-analytics/ja/",
+          "description": "『グランブルーファンタジー リリンク』のセーブデータ解析および数値修正ツール。ブラウザ上で100%ローカル動作し、XXHash64チェックサムの自動再計算に対応。",
+          "applicationCategory": "UtilitiesApplication",
+          "operatingSystem": "Any (Web Browser)",
+          "browserRequirements": "JavaScriptが有効なモダンブラウザ (Chrome, Firefox, Edge, Safari)",
+          "inLanguage": ["ja", "en", "pt-BR"],
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "author": {
+            "@type": "Person",
+            "name": "klysman08",
+            "url": "https://github.com/klysman08"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://klysman08.github.io/gbfr-save-analytics/ja/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "セーブデータが外部サーバーに送信されることはありますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ。GBFR Save Analytics はすべてブラウザ内のJavaScriptでローカル処理されます。SaveData1.dat が外部サーバーに送信されることは一切ありません。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "セーブデータの破損エラーやハッシュ計算はどのように行われますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "ゲーム本体は10個のXXHash64ハッシュで整合性を検証しています。本ツールで修正したセーブデータをダウンロードすると、ゲームが正しく認識するようにハッシュ値が自動再計算されます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "PC版 (Steam) のセーブデータはどこに保存されていますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Windowsの %LOCALAPPDATA%\\GBFR\\Saved\\SaveGames フォルダ内に SaveData1.dat およびバックアップファイルが保存されています。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <div class="seo-fallback" style="padding: 2rem 1.5rem; max-width: 960px; margin: 0 auto; font-family: system-ui, -apple-system, sans-serif; color: #1b1a24; line-height: 1.6;">
+        <header style="margin-bottom: 2rem;">
+          <h1 style="font-size: 2rem; margin-bottom: 0.5rem; color: #1b1a24;">GBFR Save Analytics — 『グランブルーファンタジー リリンク』セーブデータ解析・編集ツール</h1>
+          <p style="font-size: 1.15rem; color: #45424f;">『グランブルーファンタジー リリンク』(PC版) のセーブデータ解析および数値修正ツール。キャラクターの育成状況、ジーン、所持素材の確認、XXHash64チェックサムの整合性検証、バックアップ比較がブラウザ内で安全に行えます。</p>
+        </header>
+
+        <section style="margin-bottom: 2rem;">
+          <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem;">主な機能</h2>
+          <ul style="padding-left: 1.25rem;">
+            <li><strong>XXHash64 整合性検証・ハッシュ自動再計算:</strong> ダウンロード時にチェックサムを自動計算し、ゲーム側でセーブ破損エラーが出ないよう安全に保存。</li>
+            <li><strong>キャラクター進行度確認:</strong> レベル、MSP、EXP、装備武器、編成状況を一覧表示。</li>
+            <li><strong>ジーンおよび所持品分析:</strong> レベル別ジーン、潤沢・枯渇素材の状況を視覚化。</li>
+            <li><strong>セーブデータ比較 (進化履歴):</strong> バックアップファイルと現在のセーブの差分（ルピ、素材、レベル）を比較。</li>
+            <li><strong>完全ローカル動作・プライバシー保護:</strong> サーバーへのアップロードや外部トラッカーは一切ありません。</li>
+          </ul>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+          <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem;">よくある質問 (FAQ)</h2>
+          <details style="margin-bottom: 0.75rem;">
+            <summary style="font-weight: 600; cursor: pointer;">セーブファイルはサーバーにアップロードされますか？</summary>
+            <p style="margin-top: 0.25rem; color: #45424f;">いいえ。すべての解析と編集処理はお使いのブラウザ内部でのみ完結します。</p>
+          </details>
+          <details style="margin-bottom: 0.75rem;">
+            <summary style="font-weight: 600; cursor: pointer;">SaveData1.dat の保存場所はどこですか？</summary>
+            <p style="margin-top: 0.25rem; color: #45424f;">Steam版の場合、<code>%LOCALAPPDATA%\GBFR\Saved\SaveGames</code> フォルダにあります。</p>
+          </details>
+          <details style="margin-bottom: 0.75rem;">
+            <summary style="font-weight: 600; cursor: pointer;">ゲーム側でセーブデータが壊れていると表示される場合はどうすればいいですか？</summary>
+            <p style="margin-top: 0.25rem; color: #45424f;">本ツールに SaveData1.dat を読み込ませて整合性シールを確認し、「修正済みセーブをダウンロード」をクリックすることで正常なハッシュが再付与されます。</p>
+          </details>
+        </section>
+      </div>
+    </div>
+    <noscript>GBFR Save Analytics をご利用いただくには JavaScript を有効にする必要があります。</noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
