@@ -1,18 +1,19 @@
 import { ptBR } from './pt-BR';
 import { en } from './en';
+import { ja } from './ja';
 
-export type Lang = 'pt-BR' | 'en';
+export type Lang = 'pt-BR' | 'en' | 'ja';
 export type Dict = typeof ptBR;
 type Key = keyof Dict;
 
-const DICTS: Record<Lang, Dict> = { 'pt-BR': ptBR, en };
+const DICTS: Record<Lang, Dict> = { 'pt-BR': ptBR, en, ja };
 // v2: earlier builds saved the browser language automatically; only an explicit choice is stored now.
 const STORE_KEY = 'gbfr-lang-v2';
 
 function initial(): Lang {
   try {
     const saved = localStorage.getItem(STORE_KEY);
-    if (saved === 'pt-BR' || saved === 'en') return saved;
+    if (saved === 'pt-BR' || saved === 'en' || saved === 'ja') return saved;
   } catch { /* storage unavailable */ }
   return 'en';
 }
@@ -25,7 +26,7 @@ export const getLang = () => lang;
 export function setLang(l: Lang, persist = true) {
   lang = l;
   if (persist) try { localStorage.setItem(STORE_KEY, l); } catch { /* storage unavailable */ }
-  document.documentElement.lang = l;
+  if (typeof document !== 'undefined') document.documentElement.lang = l;
 }
 
 /** Translate with {name} placeholders. */

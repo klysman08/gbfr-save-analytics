@@ -16,7 +16,7 @@ import {
   summary, weapons,
 } from '../core/analytics';
 
-const L = () => (getLang() === 'en' ? 'en' : 'pt') as 'en' | 'pt';
+const L = () => { const l = getLang(); return (l === 'ja' ? 'ja' : l === 'en' ? 'en' : 'pt') as 'pt' | 'en' | 'ja'; };
 const M = () => state.model!;
 
 function panel(title: string, opts: { note?: string; ink?: string; wide?: boolean; id?: string } = {}, ...body: (Node | null)[]): HTMLElement {

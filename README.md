@@ -21,7 +21,7 @@
 - **Evolution between saves.** Open a second save (for example a `_BackUp`) to see the Rupies, materials and levels you gained or spent.
 - **Data correction.** Edit values with type and range validation. Every change is listed and can be undone until you download.
 - **ID table.** Each field shows what is known about it and how confident that is (confirmed, likely, possible or unknown). You can add your own notes, then export or import them.
-- **Interface in English and Brazilian Portuguese.** English is the default; switch with the language selector.
+- **Interface in English, Brazilian Portuguese, and Japanese.** English is the default; switch with the language selector.
 
 ## Screenshots
 

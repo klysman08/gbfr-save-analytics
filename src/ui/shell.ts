@@ -100,7 +100,8 @@ export function mountShell(root: HTMLElement) {
     const btnDl = h('button', { type: 'button', class: 'btn primary', 'data-sfx': 'download', disabled: !m, onclick: () => download(btnDl) }, icon('download'), h('span', {}, t('download')));
     const langSel = h('select', { class: 'lang', 'aria-label': t('language'), onchange: (e: Event) => { setLang((e.target as HTMLSelectElement).value as Lang); renderAll(); } },
       h('option', { value: 'pt-BR', selected: getLang() === 'pt-BR' }, 'PT-BR'),
-      h('option', { value: 'en', selected: getLang() === 'en' }, 'EN'));
+      h('option', { value: 'en', selected: getLang() === 'en' }, 'EN'),
+      h('option', { value: 'ja', selected: getLang() === 'ja' }, 'JA'));
     header.replaceChildren(
       h('a', { class: 'brand', href: '#/dashboard', 'aria-label': t('appName') },
         h('img', { class: 'brand-logo', src: art('logo.avif'), alt: 'Granblue Fantasy: Relink', width: 498, height: 140 }),

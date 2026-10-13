@@ -1,5 +1,5 @@
 import { h } from './dom';
-import { fmtInt, t } from '../i18n';
+import { fmtInt, getLang, t } from '../i18n';
 import { state } from './state';
 import { sfx } from './sfx';
 import { catalogOf, type Confidence } from '../core/catalog';
@@ -18,7 +18,7 @@ const describe = (u: Unit, i?: number) => {
   const c = catalogOf(u.sec, u.id);
   return `${u.sec} ${u.type} id ${u.id}${u.unit ? ' unit ' + u.unit : ''}${i !== undefined && u.count > 1 ? ` [${i}]` : ''}${c ? ' — ' + c[langKey()] : ''}`;
 };
-const langKey = () => (document.documentElement.lang === 'en' ? 'en' : 'pt') as 'en' | 'pt';
+const langKey = () => { const l = getLang(); return (l === 'ja' ? 'ja' : l === 'en' ? 'en' : 'pt') as 'pt' | 'en' | 'ja'; };
 
 /** Ink wash on an edited field: the signature feedback for a change. */
 function washIn(el: HTMLElement) {
