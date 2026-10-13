@@ -9,6 +9,7 @@ import { checkHash, hex } from '../core/hash';
 import { characters, materials, recruited, sigils, weapons } from '../core/analytics';
 import { NAME_SOURCE_URL } from '../core/names';
 import { initMusic, musicButton } from './music';
+import { initSfx, sfx, sfxButton } from './sfx';
 
 const REPO_URL = 'https://github.com/klysman08/gbfr-save-analytics';
 const AUTHOR_URL = 'https://github.com/klysman08';
@@ -96,7 +97,7 @@ export function mountShell(root: HTMLElement) {
 
   function renderHeader() {
     const m = state.model;
-    const btnDl = h('button', { type: 'button', class: 'btn primary', disabled: !m, onclick: () => download(btnDl) }, icon('download'), h('span', {}, t('download')));
+    const btnDl = h('button', { type: 'button', class: 'btn primary', 'data-sfx': 'download', disabled: !m, onclick: () => download(btnDl) }, icon('download'), h('span', {}, t('download')));
     const langSel = h('select', { class: 'lang', 'aria-label': t('language'), onchange: (e: Event) => { setLang((e.target as HTMLSelectElement).value as Lang); renderAll(); } },
       h('option', { value: 'pt-BR', selected: getLang() === 'pt-BR' }, 'PT-BR'),
       h('option', { value: 'en', selected: getLang() === 'en' }, 'EN'));
@@ -110,9 +111,10 @@ export function mountShell(root: HTMLElement) {
       h('div', { class: 'actions' },
         h('button', { type: 'button', class: 'btn ghost', 'aria-label': t('open'), title: t('open'), onclick: () => fileInput.click() }, icon('open'), h('span', {}, t('open'))),
         h('button', { type: 'button', class: 'btn ghost', 'aria-label': t('compareWith'), title: t('compareWith'), disabled: !m, onclick: () => compareInput.click() }, icon('compare'), h('span', {}, t('compareWith'))),
-        h('button', { type: 'button', class: 'btn ghost', 'aria-label': t('undoAll'), title: t('undoAll'), disabled: !state.edits?.size, onclick: () => state.edits?.undoAll() }, icon('undo'), h('span', {}, t('undoAll'))),
+        h('button', { type: 'button', class: 'btn ghost', 'aria-label': t('undoAll'), title: t('undoAll'), 'data-sfx': 'undo', disabled: !state.edits?.size, onclick: () => state.edits?.undoAll() }, icon('undo'), h('span', {}, t('undoAll'))),
         btnDl,
         musicButton(),
+        sfxButton(),
         langSel),
       m ? h('p', { class: 'dl-notice' }, t('downloadNotice')) : '');
   }
@@ -224,7 +226,7 @@ export function mountShell(root: HTMLElement) {
     const buf = new Uint8Array(await file.arrayBuffer());
     let m: SaveModel;
     try { m = parseSave(buf, file.name); }
-    catch { state.error = t('readError', { name: file.name }); notify('error'); return; }
+    catch { state.error = t('readError', { name: file.name }); notify('error'); sfx('error'); return; }
     state.error = null;
     state.model = m;
     state.edits = new EditStore(m);
@@ -241,13 +243,14 @@ export function mountShell(root: HTMLElement) {
       state.seal = s ? { kind: s.ok ? 'ok' : 'bad', status: s } : { kind: 'none' };
       notify('seal');
       shine();
+      sfx(s && !s.ok ? 'warn' : 'load');
     }, 60);
   }
 
   async function openCompare(file: File) {
-    if (!state.model) { state.error = t('compareFirst'); notify('error'); return; }
-    try { state.other = parseSave(new Uint8Array(await file.arrayBuffer()), file.name); state.error = null; }
-    catch { state.error = t('readError', { name: file.name }); }
+    if (!state.model) { state.error = t('compareFirst'); notify('error'); sfx('error'); return; }
+    try { state.other = parseSave(new Uint8Array(await file.arrayBuffer()), file.name); state.error = null; sfx('load'); }
+    catch { state.error = t('readError', { name: file.name }); sfx('error'); }
     notify('compare');
     go('compare');
   }
@@ -270,7 +273,11 @@ export function mountShell(root: HTMLElement) {
   }
 
   // Drag & drop anywhere
-  addEventListener('dragover', e => { e.preventDefault(); document.body.classList.add('dragging'); });
+  addEventListener('dragover', e => {
+    e.preventDefault();
+    if (!document.body.classList.contains('dragging')) sfx('drag');
+    document.body.classList.add('dragging');
+  });
   addEventListener('dragleave', e => { if (!(e as DragEvent).relatedTarget) document.body.classList.remove('dragging'); });
   addEventListener('drop', e => {
     e.preventDefault();
@@ -283,6 +290,7 @@ export function mountShell(root: HTMLElement) {
   renderAll();
   consent();
   initMusic();
+  initSfx();
 }
 
 function consent() {
@@ -292,7 +300,7 @@ function consent() {
     V.ornateTitle(t('responsibilityTitle')),
     h('p', {}, t('responsibilityBody')),
     h('ul', {}, h('li', {}, t('responsibilityPoints1')), h('li', {}, t('responsibilityPoints2')), h('li', {}, t('responsibilityPoints3'))),
-    h('form', { method: 'dialog' }, h('button', { class: 'btn primary', value: 'yes', autofocus: true }, icon('check'), t('responsibilityAccept'))));
+    h('form', { method: 'dialog' }, h('button', { class: 'btn primary', value: 'yes', 'data-sfx': 'confirm', autofocus: true }, icon('check'), t('responsibilityAccept'))));
   dlg.querySelector('h2')!.id = 'consent-title';
   dlg.addEventListener('close', () => { if (dlg.returnValue === 'yes') storage.set(CONSENT_KEY, 'yes'); dlg.remove(); });
   dlg.addEventListener('cancel', e => e.preventDefault());

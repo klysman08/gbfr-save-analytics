@@ -1,6 +1,7 @@
 import { h } from './dom';
 import { fmtInt, t } from '../i18n';
 import { state } from './state';
+import { sfx } from './sfx';
 import { catalogOf, type Confidence } from '../core/catalog';
 import { encodeString, formatValue, parseValue, read, readString, ValueError, type Unit } from '../core/save';
 
@@ -49,9 +50,11 @@ export function numberCell(u: Unit | undefined, i = 0, opts: { width?: string; l
       edits.apply(u, i, parseValue(u.type, inp.value));
       inp.setCustomValidity('');
       washIn(inp);
+      sfx('edit');
     } catch (e) {
       inp.setCustomValidity(errorText(e));
       inp.reportValidity();
+      sfx('error');
     }
     inp.value = shown();
     mark();
@@ -71,9 +74,11 @@ export function stringCell(u: Unit | undefined, opts: { label?: string } = {}): 
       edits.applyMany(u, encodeString(u, inp.value));
       inp.setCustomValidity('');
       washIn(inp);
+      sfx('edit');
     } catch (e) {
       inp.setCustomValidity(errorText(e));
       inp.reportValidity();
+      sfx('error');
     }
     inp.value = readString(m, u);
     mark();

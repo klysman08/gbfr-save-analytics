@@ -51,6 +51,9 @@ export const en: typeof ptBR = {
   music: 'Theme music',
   musicTurnOn: 'Turn theme music on',
   musicTurnOff: 'Turn theme music off',
+  sfx: 'Sound effects',
+  sfxTurnOn: 'Turn sound effects on',
+  sfxTurnOff: 'Turn sound effects off',
 
   inParty: 'In current party',
   sigilsWorn: 'Equipped sigils',

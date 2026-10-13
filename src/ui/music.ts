@@ -3,7 +3,7 @@ import { t } from '../i18n';
 
 // Theme music: starts with the site and remembers the visitor's choice. Browsers block audible
 // autoplay until the first interaction, so a blocked start is retried on the first click or key.
-const SRC = `${import.meta.env.BASE_URL}theme-soung.mp3`;
+const SRC = `${import.meta.env.BASE_URL}theme.mp3`;
 const KEY = 'gbfr-music-v1';
 const VOLUME = 0.35;
 const FADE_IN_MS = 1600;
@@ -84,14 +84,16 @@ export function initMusic() {
   if (!enabled) return;
   start().then(ok => {
     if (ok) return;
+    // Which events grant activation varies (a touch only counts on release), so listen to all of
+    // them and keep listening until playback actually starts.
+    const GESTURES = ['pointerdown', 'pointerup', 'touchend', 'keydown', 'click'];
+    const off = () => { for (const g of GESTURES) removeEventListener(g, unlock, true); };
     const unlock = (e: Event) => {
       // The toggle handles its own click; starting here too would make that click switch it off.
       if ((e.target as Element | null)?.closest?.('.music-btn')) return;
-      off();
-      if (enabled && !playing()) start();
+      if (!enabled || playing()) { off(); return; }
+      start().then(started => { if (started) off(); });
     };
-    const off = () => { removeEventListener('pointerdown', unlock, true); removeEventListener('keydown', unlock, true); };
-    addEventListener('pointerdown', unlock, true);
-    addEventListener('keydown', unlock, true);
+    for (const g of GESTURES) addEventListener(g, unlock, true);
   });
 }

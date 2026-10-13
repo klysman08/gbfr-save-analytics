@@ -6,6 +6,7 @@ import { barList, columns, diverging } from './charts';
 import { dataTable } from './table';
 import { CATALOG, catalogOf, type Confidence } from '../core/catalog';
 import { namePlate, portrait } from './art';
+import { sfx } from './sfx';
 import {
   EMPTY_HASH, formatValue, looksText, num, read, readAll, readString, rec, unitsOf, VALUE_TYPES,
   type SaveModel, type SectionName, type Unit,
@@ -116,7 +117,7 @@ function characterCard(c: Character, i: number): HTMLElement {
   const plate = namePlate(c.id);
   const maxed = c.level >= MAX_LEVEL;
   const name = c.name || t('unknownChar');
-  const open = () => openCharacter(c.unit);
+  const open = () => { sfx('select'); openCharacter(c.unit); };
   return h('figure', {
     class: `char-card${maxed ? ' max' : ''}${src ? '' : ' no-art'}`, style: { '--i': String(Math.min(i, 16)) } as unknown as Partial<CSSStyleDeclaration>,
     tabindex: '0', role: 'button', 'aria-haspopup': 'dialog', 'aria-label': `${name}, ${t('level')} ${c.level}, EXP ${fmtInt(c.exp)}`,
@@ -151,13 +152,13 @@ function openCharacter(unit: number) {
     dlg.replaceChildren(characterSheet(list[i], i, list.length, dir, step, () => dlg.close()));
     if (dir) dlg.querySelector<HTMLElement>(`[data-step="${dir}"]`)?.focus();
   };
-  const step = (dir: -1 | 1) => { i = (i + dir + list.length) % list.length; draw(dir); };
+  const step = (dir: -1 | 1) => { i = (i + dir + list.length) % list.length; sfx(dir > 0 ? 'next' : 'prev'); draw(dir); };
   dlg.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
   });
   dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
-  dlg.addEventListener('close', () => { dlg.remove(); returnFocus?.focus({ preventScroll: true }); });
+  dlg.addEventListener('close', () => { sfx('close'); dlg.remove(); returnFocus?.focus({ preventScroll: true }); });
   draw(0);
   document.body.append(dlg);
   dlg.showModal();
@@ -173,7 +174,7 @@ function characterSheet(c: Character, i: number, n: number, dir: -1 | 0 | 1, ste
   const worn = c.name || `#${c.hash.toString(16)}`;
   const ss = sigils(m, names).filter(s => s.wornBy === worn).sort((a, b) => b.level - a.level || a.name.localeCompare(b.name));
   const p = Math.min(1, c.exp / MAX_EXP);
-  const navBtn = (d: -1 | 1) => h('button', { type: 'button', class: 'sheet-icon', 'data-step': String(d), 'aria-label': t(d < 0 ? 'prevChar' : 'nextChar'), title: t(d < 0 ? 'prevChar' : 'nextChar'), onclick: () => step(d) }, icon(d < 0 ? 'prev' : 'next'));
+  const navBtn = (d: -1 | 1) => h('button', { type: 'button', class: 'sheet-icon', 'data-step': String(d), 'data-sfx': 'none', 'aria-label': t(d < 0 ? 'prevChar' : 'nextChar'), title: t(d < 0 ? 'prevChar' : 'nextChar'), onclick: () => step(d) }, icon(d < 0 ? 'prev' : 'next'));
   const stat = (label: string, id: number, value: number) =>
     h('div', {}, h('dt', {}, confMark(confOf(id), false), label), h('dd', {}, fmtInt(value)));
   const list = (ink: string, title: string, count: number, body: Node) =>
@@ -195,7 +196,7 @@ function characterSheet(c: Character, i: number, n: number, dir: -1 | 0 | 1, ste
           n > 1 ? navBtn(-1) : null,
           n > 1 ? h('span', { class: 'sheet-pos' }, `${i + 1} / ${n}`) : null,
           n > 1 ? navBtn(1) : null,
-          h('button', { type: 'button', class: 'sheet-icon', 'aria-label': t('close'), title: t('close'), autofocus: true, onclick: close }, icon('close')))),
+          h('button', { type: 'button', class: 'sheet-icon', 'data-sfx': 'none', 'aria-label': t('close'), title: t('close'), autofocus: true, onclick: close }, icon('close')))),
       h('section', { class: 'sheet-level' },
         h('div', {},
           h('span', { class: 'lbl' }, confMark(confOf(1308), false), t('level')),
@@ -213,7 +214,7 @@ function characterSheet(c: Character, i: number, n: number, dir: -1 | 0 | 1, ste
         : h('p', { class: 'muted' }, t('noSigils'))),
       h('footer', { class: 'sheet-foot' },
         h('p', { class: 'note' }, t('sheetNote')),
-        h('button', { type: 'button', class: 'btn', onclick: () => { close(); revealEditor(); } }, t('editCharacter')))));
+        h('button', { type: 'button', class: 'btn', 'data-sfx': 'none', onclick: () => { close(); revealEditor(); } }, t('editCharacter')))));
 }
 
 /** Takes the visitor to the characters edit table (route change renders asynchronously). */
@@ -525,7 +526,7 @@ export function changesView(): HTMLElement {
         h('td', { class: 'mono' }, `${e.u.sec} ${e.u.type} id ${e.u.id} unit ${e.u.unit}${e.u.count > 1 ? ` [${e.i}]` : ''}`),
         h('td', { class: 'note' }, catalogOf(e.u.sec, e.u.id)?.[L()] ?? ''),
         h('td', { class: 'mono changes' }, h('del', {}, formatValue(e.u, e.before)), ' → ', h('ins', {}, formatValue(e.u, e.after))),
-        h('td', {}, h('button', { type: 'button', class: 'ghost small', onclick: () => edits.undo(e) }, t('undo'))))))))
+        h('td', {}, h('button', { type: 'button', class: 'ghost small', 'data-sfx': 'undo', onclick: () => edits.undo(e) }, t('undo'))))))))
       : h('p', { class: 'empty-state' }, t('noChanges')),
     h('p', { class: 'note' }, t('changesHelp', { name: state.model!.name }))));
 }

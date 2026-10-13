@@ -49,6 +49,9 @@ export const ptBR = {
   music: 'Música tema',
   musicTurnOn: 'Ativar música tema',
   musicTurnOff: 'Desativar música tema',
+  sfx: 'Efeitos sonoros',
+  sfxTurnOn: 'Ativar efeitos sonoros',
+  sfxTurnOff: 'Desativar efeitos sonoros',
 
   inParty: 'Na equipe atual',
   sigilsWorn: 'Sigilos equipados',
