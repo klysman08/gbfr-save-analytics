@@ -8,8 +8,10 @@ import { EditStore } from '../core/edits';
 import { checkHash, hex } from '../core/hash';
 import { characters, materials, recruited, sigils, weapons } from '../core/analytics';
 import { NAME_SOURCE_URL } from '../core/names';
+import { initMusic, musicButton } from './music';
 
 const REPO_URL = 'https://github.com/klysman08/gbfr-save-analytics';
+const AUTHOR_URL = 'https://github.com/klysman08';
 const CONSENT_KEY = 'gbfr-consent-v1';
 
 type Route = 'dashboard' | 'characters' | 'sigils' | 'materials' | 'weapons' | 'other' | 'explore' | 'ids' | 'compare' | 'changes';
@@ -110,6 +112,7 @@ export function mountShell(root: HTMLElement) {
         h('button', { type: 'button', class: 'btn ghost', 'aria-label': t('compareWith'), title: t('compareWith'), disabled: !m, onclick: () => compareInput.click() }, icon('compare'), h('span', {}, t('compareWith'))),
         h('button', { type: 'button', class: 'btn ghost', 'aria-label': t('undoAll'), title: t('undoAll'), disabled: !state.edits?.size, onclick: () => state.edits?.undoAll() }, icon('undo'), h('span', {}, t('undoAll'))),
         btnDl,
+        musicButton(),
         langSel),
       m ? h('p', { class: 'dl-notice' }, t('downloadNotice')) : '');
   }
@@ -132,6 +135,8 @@ export function mountShell(root: HTMLElement) {
     footer.replaceChildren(
       h('i', { class: 'ornament', 'aria-hidden': 'true' }),
       h('p', { class: 'notice' }, t('footerNotice')),
+      h('p', { class: 'author' }, t('madeBy'), ' ',
+        h('a', { href: AUTHOR_URL, target: '_blank', rel: 'noopener' }, icon('github', 14), 'klysman08')),
       h('p', { class: 'credits' },
         h('a', { href: REPO_URL, target: '_blank', rel: 'noopener' }, icon('github', 14), ' ', t('source')),
         ' · ',
@@ -277,6 +282,7 @@ export function mountShell(root: HTMLElement) {
 
   renderAll();
   consent();
+  initMusic();
 }
 
 function consent() {

@@ -40,6 +40,11 @@ Gains and spending use blue `#3860be` and copper `#b0561c`.
   - At rest: white border, card-base lace behind the art, a white "Playable"-style level plate, and a gold plate for MAX.
   - On hover: a violet→blue frame, the vertical name lettering, and a small lift.
 - **Panels:** white cards with a soft shadow. Each title has a small lozenge in its data ink.
+- **Character sheet:** clicking a portrait card opens a modal dialog.
+  - Left: the full portrait on card-base lace, with an inset violet→blue frame, the name lettering and the level plate.
+  - Right: name, ID, party chip, level and EXP bar, an HP / Attack / MSP ledger with confidence marks, and the character's weapons and equipped sigils.
+  - It is read-only. ←/→ step through characters; Esc, ✕ or the backdrop close it. Below 760px it stacks into a portrait band with the details underneath.
+- **Music toggle:** an icon-only ghost button next to the language selector. It is tinted violet while the theme plays, and the choice is remembered.
 - **Buttons:** white with a hairline border. The primary button uses a violet→blue gradient with a gold inner hairline.
 
 ## Motion

@@ -1,4 +1,4 @@
-import { h, downloadBlob, storage } from './dom';
+import { h, icon, downloadBlob, reducedMotion, storage } from './dom';
 import { fmtDate, fmtInt, fmtPct, fmtSigned, getLang, t } from '../i18n';
 import { state } from './state';
 import { confMark, nameCell, numberCell, stringCell } from './cells';
@@ -110,13 +110,19 @@ function charName(c: Character): Node {
   return h('span', { class: 'named' }, h('span', {}, t('unknownChar'), ' ', confMark('possible', false)), h('span', { class: 'id' }, `#${c.hash.toString(16)}`));
 }
 
-/** Portrait card in the official site's style: framed art, vertical name plate, level plate, EXP bar. */
+/** Portrait card in the official site's style: framed art, vertical name plate, level plate, EXP bar. Opens the character sheet. */
 function characterCard(c: Character, i: number): HTMLElement {
   const src = portrait(c.id);
   const plate = namePlate(c.id);
   const maxed = c.level >= MAX_LEVEL;
   const name = c.name || t('unknownChar');
-  return h('figure', { class: `char-card${maxed ? ' max' : ''}${src ? '' : ' no-art'}`, style: { '--i': String(Math.min(i, 16)) } as unknown as Partial<CSSStyleDeclaration>, tabindex: '0', 'aria-label': `${name}, ${t('level')} ${c.level}, EXP ${fmtInt(c.exp)}` },
+  const open = () => openCharacter(c.unit);
+  return h('figure', {
+    class: `char-card${maxed ? ' max' : ''}${src ? '' : ' no-art'}`, style: { '--i': String(Math.min(i, 16)) } as unknown as Partial<CSSStyleDeclaration>,
+    tabindex: '0', role: 'button', 'aria-haspopup': 'dialog', 'aria-label': `${name}, ${t('level')} ${c.level}, EXP ${fmtInt(c.exp)}`,
+    onclick: open,
+    onkeydown: (e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } },
+  },
     h('div', { class: 'char-art' },
       src ? h('img', { src, alt: '', loading: 'lazy', decoding: 'async', width: 280, height: 536 }) : h('span', { class: 'char-unknown', 'aria-hidden': 'true' }, '?'),
       plate ? h('img', { class: 'char-plate', src: plate, alt: '', loading: 'lazy', 'aria-hidden': 'true' }) : null,
@@ -128,7 +134,98 @@ function characterCard(c: Character, i: number): HTMLElement {
 }
 
 function characterGallery(cs: Character[]): HTMLElement {
-  return h('div', { class: 'gallery', role: 'list' }, cs.map((c, i) => { const card = characterCard(c, i); card.setAttribute('role', 'listitem'); return card; }));
+  return h('div', { class: 'gallery' }, cs.map(characterCard));
+}
+
+// ---------------------------------------------------------------- Character sheet (modal)
+const confOf = (id: number): Confidence => catalogOf('main', id)?.conf ?? 'unknown';
+
+/** Opens a character's sheet. ←/→ step through the gallery order; Esc, ✕ or the backdrop close it. */
+function openCharacter(unit: number) {
+  const list = recruited(characters(M(), state.names));
+  if (!list.length) return;
+  let i = Math.max(0, list.findIndex(c => c.unit === unit));
+  const returnFocus = document.activeElement as HTMLElement | null;
+  const dlg = h('dialog', { class: 'char-dialog', 'aria-labelledby': 'sheet-name' });
+  const draw = (dir: -1 | 0 | 1) => {
+    dlg.replaceChildren(characterSheet(list[i], i, list.length, dir, step, () => dlg.close()));
+    if (dir) dlg.querySelector<HTMLElement>(`[data-step="${dir}"]`)?.focus();
+  };
+  const step = (dir: -1 | 1) => { i = (i + dir + list.length) % list.length; draw(dir); };
+  dlg.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+  });
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+  dlg.addEventListener('close', () => { dlg.remove(); returnFocus?.focus({ preventScroll: true }); });
+  draw(0);
+  document.body.append(dlg);
+  dlg.showModal();
+}
+
+function characterSheet(c: Character, i: number, n: number, dir: -1 | 0 | 1, step: (d: -1 | 1) => void, close: () => void): HTMLElement {
+  const m = M(), names = state.names;
+  const src = portrait(c.id), plate = namePlate(c.id);
+  const maxed = c.level >= MAX_LEVEL;
+  const name = c.name || t('unknownChar');
+  const inParty = !!c.name && party(m, names).includes(c.name);
+  const ws = c.id ? weapons(m, names).filter(w => w.id.startsWith(`WEP_${c.id}`)).sort((a, b) => b.uncap - a.uncap || b.awakening - a.awakening) : [];
+  const worn = c.name || `#${c.hash.toString(16)}`;
+  const ss = sigils(m, names).filter(s => s.wornBy === worn).sort((a, b) => b.level - a.level || a.name.localeCompare(b.name));
+  const p = Math.min(1, c.exp / MAX_EXP);
+  const navBtn = (d: -1 | 1) => h('button', { type: 'button', class: 'sheet-icon', 'data-step': String(d), 'aria-label': t(d < 0 ? 'prevChar' : 'nextChar'), title: t(d < 0 ? 'prevChar' : 'nextChar'), onclick: () => step(d) }, icon(d < 0 ? 'prev' : 'next'));
+  const stat = (label: string, id: number, value: number) =>
+    h('div', {}, h('dt', {}, confMark(confOf(id), false), label), h('dd', {}, fmtInt(value)));
+  const list = (ink: string, title: string, count: number, body: Node) =>
+    h('section', { class: `sheet-list ink-${ink}` }, h('h3', {}, title, h('sup', {}, fmtInt(count))), body);
+
+  return h('article', { class: `sheet${maxed ? ' max' : ''}${dir ? (dir > 0 ? ' from-next' : ' from-prev') : ' from-open'}` },
+    h('div', { class: `sheet-art${src ? '' : ' no-art'}` },
+      src ? h('img', { class: 'sheet-portrait', src, alt: '', width: 280, height: 536 }) : h('span', { class: 'char-unknown', 'aria-hidden': 'true' }, '?'),
+      plate ? h('img', { class: 'sheet-plate', src: plate, alt: '', 'aria-hidden': 'true' }) : null,
+      h('span', { class: 'char-lv' }, maxed ? t('maxShort') : 'Lv', ' ', h('b', {}, c.level))),
+    h('div', { class: 'sheet-body' },
+      h('header', { class: 'sheet-head' },
+        h('div', { class: 'sheet-title' },
+          h('h2', { id: 'sheet-name' }, name),
+          h('p', { class: 'sheet-meta' },
+            h('span', { class: 'mono' }, c.id || `#${c.hash.toString(16)}`),
+            inParty ? h('span', { class: 'chip party' }, t('inParty')) : null)),
+        h('div', { class: 'sheet-nav' },
+          n > 1 ? navBtn(-1) : null,
+          n > 1 ? h('span', { class: 'sheet-pos' }, `${i + 1} / ${n}`) : null,
+          n > 1 ? navBtn(1) : null,
+          h('button', { type: 'button', class: 'sheet-icon', 'aria-label': t('close'), title: t('close'), autofocus: true, onclick: close }, icon('close')))),
+      h('section', { class: 'sheet-level' },
+        h('div', {},
+          h('span', { class: 'lbl' }, confMark(confOf(1308), false), t('level')),
+          h('strong', { class: 'fig' }, c.level, h('small', {}, ` / ${MAX_LEVEL}`))),
+        h('div', { class: 'sheet-exp' },
+          h('span', { class: 'lbl' }, confMark(confOf(1303), false), t('exp')),
+          progressBar(p, maxed),
+          h('span', { class: 'sheet-exp-n' }, `${fmtInt(c.exp)} / ${fmtInt(MAX_EXP)} · ${fmtPct(p)}`))),
+      h('dl', { class: 'sheet-stats' }, stat(t('hp'), 1309, c.hp), stat(t('atk'), 1310, c.atk), stat(t('msp'), 1321, c.msp)),
+      list('wep', t('weapons'), ws.length, ws.length
+        ? h('ul', {}, ws.map(w => h('li', {}, h('span', { class: 'sheet-item' }, w.name), h('span', { class: 'sheet-tags' }, `${t('uncap')} ${w.uncap} · ${t('awakening')} ${w.awakening}`))))
+        : h('p', { class: 'muted' }, t('noWeapons'))),
+      list('sigil', t('sigilsWorn'), ss.length, ss.length
+        ? h('ul', {}, ss.map(s => h('li', {}, h('span', { class: 'sheet-item' }, s.name), h('span', { class: 'sheet-tags' }, `Lv ${s.level}`))))
+        : h('p', { class: 'muted' }, t('noSigils'))),
+      h('footer', { class: 'sheet-foot' },
+        h('p', { class: 'note' }, t('sheetNote')),
+        h('button', { type: 'button', class: 'btn', onclick: () => { close(); revealEditor(); } }, t('editCharacter')))));
+}
+
+/** Takes the visitor to the characters edit table (route change renders asynchronously). */
+function revealEditor() {
+  if (!/characters/.test(location.hash)) location.hash = '#/characters';
+  let tries = 0;
+  const seek = () => {
+    const el = document.getElementById('char-edit');
+    if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+    else if (tries++ < 60) requestAnimationFrame(seek);
+  };
+  requestAnimationFrame(seek);
 }
 
 export function charactersView(): HTMLElement {
@@ -137,7 +234,7 @@ export function charactersView(): HTMLElement {
   const r = (unit: number, id: number) => rec(m, id, unit);
   return h('div', { class: 'view' },
     h('section', { class: 'band' }, ornateTitle(t('characters'), 'h1'), characterGallery(cs)),
-    panel(t('charEditTitle'), { note: t('charEditNote'), ink: 'chara', wide: true },
+    panel(t('charEditTitle'), { note: t('charEditNote'), ink: 'chara', wide: true, id: 'char-edit' },
       dataTable([
         { label: t('character'), sort: c => c.name || '~', cell: charName },
         { label: t('level'), sort: c => c.level, numeric: true, cell: c => numberCell(r(c.unit, 1308), 0, { width: '5em', label: `${c.name} ${t('level')}` }) },
